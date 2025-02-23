@@ -1,9 +1,9 @@
 import { Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
-import { HapticTab } from "../../../components/HapticTab";
-import { useColorScheme } from "../../../hooks/useColorScheme";
-import theme from "../../../styles/theme";
+import { HapticTab } from "../components/HapticTab";
+import { useColorScheme } from "../hooks/useColorScheme";
+import theme from "../styles/theme";
 import {
   FontAwesome,
   Entypo,
