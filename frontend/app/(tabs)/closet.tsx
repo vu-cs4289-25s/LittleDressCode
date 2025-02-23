@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Link } from 'expo-router'; // For navigation
 import { MaterialIcons } from '@expo/vector-icons'; // For icons
 
 const ClosetScreen = () => {
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Closet page</Text>
@@ -17,6 +18,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'white',
     padding: 20,
   },
   title: {

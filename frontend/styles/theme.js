@@ -1,5 +1,9 @@
 const theme = {
   colors: {
+    buttonBackground: {
+      light: "#F5F5F5",
+      dark: "#181C25",
+    },
     icons: {
       light: "#E1E1E1",
       medium: "#9A9A9A", // unselected nav location
@@ -10,6 +14,7 @@ const theme = {
       secondary: "#F5F5F5",
     },
     text: {
+      lightest: "white",
       light: "#B1B1B1", // Text over light gray
       medium: "#9A9A9A",
       dark: "#181C25",
@@ -31,9 +36,14 @@ const theme = {
     //tbd
   },
   spacing: {
-    small: "8px",
-    medium: "16px",
-    large: "24px",
+    small: 8,
+    medium: 13,
+    large: 16,
+  },
+
+  borderRadius: {
+    default: 100,
+    small: 10,
   },
 };
 

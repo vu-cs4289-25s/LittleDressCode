@@ -29,18 +29,18 @@ export default function TabLayout() {
           ios: {
             // Use a transparent background on iOS to show the blur effect
             position: "absolute",
-            flexDirection: "column", // Ensure vertical stacking
+            flexDirection: "column", 
             alignItems: "center",
             justifyContent: "center",
-            height: 60, // Adjust height for better spacing
-            paddingBottom: 5, // Adds spacing
+            height: 60,
+            paddingBottom: 5,
           },
           default: {
             height: 70,
           },
         }),
         tabBarIconStyle: {
-          flexDirection: "column", // Stack icon & text
+          flexDirection: "column", 
           alignItems: "center",
           justifyContent: "center",
         },
