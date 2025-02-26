@@ -1,19 +1,16 @@
-import { View, Image, StyleSheet, ActivityIndicator } from 'react-native'; 
+import { View, Image, StyleSheet, ActivityIndicator, Pressable } from 'react-native'; 
 import theme from "../styles/theme";
 import React, { useState, useEffect } from "react";
+import {MaterialIcons} from "@expo/vector-icons";
 
-interface ItemContainerProps {
-    clothingItemUrl?: string | null; // Image URL from database, can be null initially
-  }
-
-  const ItemContainer: React.FC<ItemContainerProps> = ({ clothingItem }:any) => {
-    const [imageSource, setImageSource] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+const ItemContainer = ({ clothingItem, isFavorited, toggleFavorite }) => {
+  const [imageSource, setImageSource] = useState(null);
+  const [loading, setLoading] = useState(true);
   
     useEffect(() => {
       if (clothingItem) {
         try {
-            setImageSource(clothingItem); 
+          setImageSource(clothingItem); 
         } catch (error) {
           console.warn("Error loading image:", error);
           setImageSource(require("../assets/images/shirt.png")); // Fallback image
@@ -23,16 +20,27 @@ interface ItemContainerProps {
       }
       setLoading(false);
     }, [clothingItem]);
+
     return (
         <View style={styles.box}>
+           <Pressable style={styles.iconContainer} onPress={toggleFavorite}>
+                <MaterialIcons name={"favorite"} 
+                    size={24} 
+                    color={isFavorited ? theme.colors.icons.favorited : theme.colors.icons.default_heart} />
+            </Pressable>
           {loading ? (
             <ActivityIndicator size="large" color="#000" />
           ) : (
-            <Image source={imageSource} style={styles.image} resizeMode="contain" onLoad={() => setLoading(false)}/>
+            <Image 
+              source={imageSource} 
+              style={styles.image} 
+              resizeMode="contain" 
+              onLoad={() => setLoading(false)}
+            />
           )}
         </View>
-      );
-    };
+    );
+};
 
 const styles = StyleSheet.create({
     box: {
@@ -46,11 +54,18 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.backgrounds.secondary,
         borderRadius: 10,
     },
+    iconContainer: {
+      position: "absolute",
+      top: 10,
+      right: 10,
+      borderRadius: 15,
+      padding: 4,
+  },
     image: {
         width: "100%",
         height: "100%",
         borderRadius: 10,
-      },
+    },
 });
 
-export default ItemContainer
+export default ItemContainer;
