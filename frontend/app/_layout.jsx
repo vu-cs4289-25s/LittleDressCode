@@ -1,3 +1,4 @@
+// frontend/app/_layout.jsx
 import { Stack } from 'expo-router/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -9,9 +10,9 @@ import { store } from '@/store';
 // Persist Redux state
 const persistor = persistStore(store);
 
-// Authentication selector (Assumes Redux is storing auth state)
+// Authentication selector
 const AuthCheck = () => {
-  const isAuthenticated = useSelector(state => state.user.isAuthenticated); // Adjust based on your Redux store
+  const isAuthenticated = useSelector(state => state.user.isAuthenticated); // Adjust path if needed
 
   return (
     <SafeAreaProvider>
@@ -23,11 +24,16 @@ const AuthCheck = () => {
             options={{ headerShown: false }}
           />
         ) : (
-          // If not logged in, go to auth stack
-          <Stack.Screen
-            name="(auth)/welcome"
-            options={{ headerShown: false }}
-          />
+          <>
+            <Stack.Screen
+              name="(auth)/welcome"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(auth)/login" // Add the login screen route
+              options={{ headerShown: false }}
+            />
+          </>
         )}
       </Stack>
       <Toast />

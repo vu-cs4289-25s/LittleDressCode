@@ -9,7 +9,7 @@ const ClosetScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Closet page</Text>
-      <ItemContainer clothingItemUrl={require("../../assets/images/shirt.png")} />
+      <ItemContainer clothingItemUrl={require("../../../assets/images/shirt.png")} />
     </View>
   );
 };

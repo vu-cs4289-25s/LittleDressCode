@@ -5,7 +5,6 @@ import { persistReducer } from "redux-persist";
 
 //? Reducers
 import userReducer from "./slices/user.slices";
-
 import apiSlice from "@/services/api";
 
 const persistConfig = {
