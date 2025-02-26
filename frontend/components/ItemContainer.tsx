@@ -3,54 +3,48 @@ import theme from "../styles/theme";
 import React, { useState, useEffect } from "react";
 
 interface ItemContainerProps {
-    clothingItemUrl?: string | null; // Image URL from database, can be null initially
-  }
+  clothingItemUrl?: string | null; // URL of the image to display
+}
 
-  const ItemContainer: React.FC<ItemContainerProps> = ({ clothingItem }:any) => {
-    const [imageSource, setImageSource] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-  
-    useEffect(() => {
-      if (clothingItem) {
-        try {
-            setImageSource(clothingItem); 
-        } catch (error) {
-          console.warn("Error loading image:", error);
-          setImageSource(require("../assets/images/shirt.png")); // Fallback image
-        }
-      } else {
-        setImageSource(require("../assets/images/shirt.png")); // Default placeholder
-      }
-      setLoading(false);
-    }, [clothingItem]);
-    return (
-        <View style={styles.box}>
-          {loading ? (
-            <ActivityIndicator size="large" color="#000" />
-          ) : (
-            <Image source={imageSource} style={styles.image} resizeMode="contain" onLoad={() => setLoading(false)}/>
-          )}
-        </View>
-      );
-    };
+const ItemContainer: React.FC<ItemContainerProps> = ({ clothingItemUrl }) => {
+  const [imageSource, setImageSource] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (clothingItemUrl) {
+      setImageSource(clothingItemUrl); // Set the image URL if available
+      setLoading(false); // Stop loading after image is set
+    } else {
+      setLoading(false); // If no image URL, stop loading
+    }
+  }, [clothingItemUrl]);
+
+  return (
+    <View style={styles.box}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#000" />
+      ) : (
+        imageSource ? <Image source={{ uri: imageSource }} style={styles.image} /> : null
+      )}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    box: {
-        display: "flex",
-        width: 173,
-        height: 173,
-        paddingHorizontal: 17,
-        paddingVertical: 16,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: theme.colors.backgrounds.secondary,
-        borderRadius: 10,
-    },
-    image: {
-        width: "100%",
-        height: "100%",
-        borderRadius: 10,
-      },
+  box: {
+    width: 150, 
+    height: 150,
+    margin: 10,
+    backgroundColor: theme.colors.backgrounds.secondary,
+    borderRadius: 10,
+    justifyContent: 'center', 
+    alignItems: 'center',
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 10,
+  },
 });
 
-export default ItemContainer
+export default ItemContainer;

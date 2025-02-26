@@ -1,44 +1,60 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Link } from 'expo-router'; // For navigation
-import { MaterialIcons } from '@expo/vector-icons'; // For icons
+import React, { useState } from "react";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import Upload from "../../../components/upload"; 
 import ItemContainer from '@/components/ItemContainer';
 
 const ClosetScreen = () => {
+  const [imageUrls, setImageUrls] = useState([]); // Array to hold multiple image URLs
+
+  // Handle upload success
+  const handleUploadSuccess = (url) => {
+    setImageUrls((prevUrls) => [...prevUrls, url]); // Add the new image URL to the array
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Closet page</Text>
-      <ItemContainer clothingItemUrl={require("../../../assets/images/shirt.png")} />
+      {/* Header with Upload button */}
+      <View style={styles.header}>
+        <Text style={styles.title}>My Closet</Text>
+        <View style={styles.uploadButtonContainer}>
+          <Upload onUploadSuccess={handleUploadSuccess} />
+        </View>
+      </View>
+
+      {/* Render multiple ItemContainers */}
+      <ScrollView contentContainerStyle={styles.closetContainer}>
+        {imageUrls.map((url, index) => (
+          <ItemContainer key={index} clothingItemUrl={url} />
+        ))}
+      </ScrollView>
     </View>
   );
 };
 
-// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    padding: 20,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 18,
+    fontWeight: "bold",
   },
-  subtitle: {
-    fontSize: 15,
-    color: '#666',
-    marginBottom: 30,
-    textAlign: 'center',
+  uploadButtonContainer: {
+    marginRight: 8, // Adjust spacing as needed
   },
-  actions: {
-    width: '100%',
-    gap: 10,
-  },
-  icon: {
-    marginTop: 30,
+  closetContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+    padding: 16,
   },
 });
 
