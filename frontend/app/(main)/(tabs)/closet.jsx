@@ -1,14 +1,22 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Link } from 'expo-router'; // For navigation
-import { MaterialIcons } from '@expo/vector-icons'; // For icons
-import ItemContainer from '@/components/ItemContainer';
+import GridLayout from '@/components/GridLayout'; // Import the GridLayout component
 
 const ClosetScreen = () => {
+  // Sample clothing data (replace with actual data from your database)
+  const clothingData = [
+    { id: "1", image: require("../../../assets/images/shirt.png") },
+    { id: "2", image: require("../../../assets/images/shirt.png") },
+    { id: "3", image: require("../../../assets/images/shirt.png") },
+    { id: "4", image: require("../../../assets/images/shirt.png") },
+    { id: "5", image: require("../../../assets/images/shirt.png") },
+    { id: "6", image: require("../../../assets/images/shirt.png") },
+  ];
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Closet page</Text>
-      <ItemContainer clothingItemUrl={require("../../../assets/images/shirt.png")} />
+      <Text style={styles.title}>My Closet</Text>
+      <GridLayout data={clothingData} numColumns={2} />
     </View>
   );
 };
@@ -17,28 +25,14 @@ const ClosetScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: 'white',
-    padding: 20,
+    padding: 16, // Matches the 16px gap
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: '#666',
-    marginBottom: 30,
     textAlign: 'center',
-  },
-  actions: {
-    width: '100%',
-    gap: 10,
-  },
-  icon: {
-    marginTop: 30,
+    marginBottom: 16,
   },
 });
 

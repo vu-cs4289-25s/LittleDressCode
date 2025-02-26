@@ -13,7 +13,8 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "**/*.jsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "app/(main)/(tabs)/_layout.js", "app/_layout.jsx", "app/(auth)/welcome.jsx"  ]
+, "app/(main)/(tabs)/_layout.js", "app/_layout.jsx", "app/(auth)/welcome.jsx", "components/ItemContainer.jsx"  ]
 }
