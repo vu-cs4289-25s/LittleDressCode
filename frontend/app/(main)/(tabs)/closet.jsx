@@ -5,7 +5,6 @@ import { MaterialIcons } from '@expo/vector-icons'; // For icons
 import ItemContainer from '@/components/ItemContainer';
 
 const ClosetScreen = () => {
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Closet page</Text>
