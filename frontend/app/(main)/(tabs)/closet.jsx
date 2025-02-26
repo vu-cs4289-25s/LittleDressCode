@@ -4,7 +4,6 @@ import { Link } from 'expo-router'; // For navigation
 import { MaterialIcons } from '@expo/vector-icons'; // For icons
 
 const ClosetScreen = () => {
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Closet page</Text>
