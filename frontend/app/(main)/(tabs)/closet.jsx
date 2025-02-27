@@ -1,16 +1,21 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import Upload from "../../../components/upload"; 
-import ItemContainer from '@/components/ItemContainer';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import GridLayout from '@/components/GridLayout'; // Import the GridLayout component
+import Upload from "../../../components/upload";
 
 const ClosetScreen = () => {
-  const [imageUrls, setImageUrls] = useState([]); // Array to hold multiple image URLs
+  const [clothingData, setClothingData] = useState([]); // Holds images with IDs
 
-  // Handle upload success
+  // Handle upload success, assigning a unique incrementing ID
   const handleUploadSuccess = (url) => {
-    setImageUrls((prevUrls) => [...prevUrls, url]); // Add the new image URL to the array
+    setClothingData((prevData) => [
+      ...prevData,
+      { id: prevData.length + 1, image: { uri: url } },
+    ]);
   };
 
+  
+  
   return (
     <View style={styles.container}>
       {/* Header with Upload button */}
@@ -20,42 +25,46 @@ const ClosetScreen = () => {
           <Upload onUploadSuccess={handleUploadSuccess} />
         </View>
       </View>
-
-      {/* Render multiple ItemContainers */}
-      <ScrollView contentContainerStyle={styles.closetContainer}>
-        {imageUrls.map((url, index) => (
-          <ItemContainer key={index} clothingItemUrl={url} />
-        ))}
-      </ScrollView>
+  
+      {/* Grid Layout for clothing data */}
+      <GridLayout data={clothingData} numColumns={2} />
     </View>
   );
+  
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    backgroundColor: 'white',
+    padding: 16, // Matches the 16px gap
   },
   title: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  uploadButtonContainer: {
-    marginRight: 8, // Adjust spacing as needed
-  },
-  closetContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
-    padding: 16,
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16,
   },
 });
 
 export default ClosetScreen;
+
+
+// return (
+//   <View style={styles.container}>
+//     {/* Header with Upload button */}
+//     <View style={styles.header}>
+//       <Text style={styles.title}>My Closet</Text>
+//       <View style={styles.uploadButtonContainer}>
+//         <Upload onUploadSuccess={handleUploadSuccess} />
+//       </View>
+//     </View>
+
+//     {/* Render multiple ItemContainers */}
+//     <ScrollView contentContainerStyle={styles.closetContainer}>
+//       {imageUrls.map((url, index) => (
+//         <ItemContainer key={index} clothingItemUrl={url} />
+//       ))}
+//     </ScrollView>
+//   </View>
+// );

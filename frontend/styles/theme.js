@@ -8,6 +8,8 @@ const theme = {
       light: "#E1E1E1",
       medium: "#9A9A9A", // unselected nav location
       dark: "#181C25", // current nav location
+      favorited: "#F7B0BE",
+      default_heart: "#E1E1E1",
     },
     backgrounds: {
       primary: "white",
