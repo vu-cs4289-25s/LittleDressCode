@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import GridLayout from '@/components/GridLayout'; // Import the GridLayout component
-impo
+import Upload from "../../../components/upload";
 
 const ClosetScreen = () => {
   const [clothingData, setClothingData] = useState([]); // Holds images with IDs
