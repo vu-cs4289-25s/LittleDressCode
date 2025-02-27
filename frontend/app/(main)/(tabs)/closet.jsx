@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import GridLayout from '@/components/GridLayout'; // Import the GridLayout component
-import Upload from "../../../components/upload";
+impo
 
 const ClosetScreen = () => {
   const [clothingData, setClothingData] = useState([]); // Holds images with IDs
@@ -48,23 +48,3 @@ const styles = StyleSheet.create({
 });
 
 export default ClosetScreen;
-
-
-// return (
-//   <View style={styles.container}>
-//     {/* Header with Upload button */}
-//     <View style={styles.header}>
-//       <Text style={styles.title}>My Closet</Text>
-//       <View style={styles.uploadButtonContainer}>
-//         <Upload onUploadSuccess={handleUploadSuccess} />
-//       </View>
-//     </View>
-
-//     {/* Render multiple ItemContainers */}
-//     <ScrollView contentContainerStyle={styles.closetContainer}>
-//       {imageUrls.map((url, index) => (
-//         <ItemContainer key={index} clothingItemUrl={url} />
-//       ))}
-//     </ScrollView>
-//   </View>
-// );
