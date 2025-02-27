@@ -1,27 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import GridLayout from '@/components/GridLayout'; // Import the GridLayout component
+impo
 
 const ClosetScreen = () => {
-  // Sample clothing data (replace with actual data from your database)
-  const clothingData = [
-    { id: "1", image: require("../../../assets/images/shirt.png") },
-    { id: "2", image: require("../../../assets/images/shirt.png") },
-    { id: "3", image: require("../../../assets/images/shirt.png") },
-    { id: "4", image: require("../../../assets/images/shirt.png") },
-    { id: "5", image: require("../../../assets/images/shirt.png") },
-    { id: "6", image: require("../../../assets/images/shirt.png") },
-  ];
+  const [clothingData, setClothingData] = useState([]); // Holds images with IDs
 
+  // Handle upload success, assigning a unique incrementing ID
+  const handleUploadSuccess = (url) => {
+    setClothingData((prevData) => [
+      ...prevData,
+      { id: prevData.length + 1, image: { uri: url } },
+    ]);
+  };
+
+  
+  
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>My Closet</Text>
+      {/* Header with Upload button */}
+      <View style={styles.header}>
+        <Text style={styles.title}>My Closet</Text>
+        <View style={styles.uploadButtonContainer}>
+          <Upload onUploadSuccess={handleUploadSuccess} />
+        </View>
+      </View>
+  
+      {/* Grid Layout for clothing data */}
       <GridLayout data={clothingData} numColumns={2} />
     </View>
   );
+  
 };
 
-// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,

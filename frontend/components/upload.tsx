@@ -1,34 +1,34 @@
-import React, { useState } from 'react';
-import { Button, Image, View, StyleSheet, Alert } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import AWS from 'aws-sdk';
-import md5 from 'react-native-md5';
+import React, { useState } from "react";
+import { TouchableOpacity, Text, StyleSheet, Alert } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import AWS from "aws-sdk";
 
-const UploadScreen = () => {
-  const [image, setImage] = useState<string | null>(null);
+interface UploadProps {
+  onUploadSuccess: (imageUrl: string) => void;
+}
 
-  // Need to configure AWS S3
+const Upload: React.FC<UploadProps> = ({ onUploadSuccess }) => {
+  const [loading, setLoading] = useState(false);
+
+  // AWS S3 configuration
   const s3 = new AWS.S3({
     accessKeyId: "AKIA42PHH65MOHVDTVGP",
     secretAccessKey: "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",
-    region: "us-east-2"
+    region: "us-east-2",
   });
 
-  // Function to handle image picking
-  const pickImage = async (fromCamera: boolean) => {
-    // Request permissions dynamically
-    const { status } = await (fromCamera 
+  const handleImagePick = async (fromCamera: boolean) => {
+    const { status } = await (fromCamera
       ? ImagePicker.requestCameraPermissionsAsync()
       : ImagePicker.requestMediaLibraryPermissionsAsync()
     );
 
-    if (status !== 'granted') {
-      alert('Sorry, we need permissions to access your camera and photos!');
+    if (status !== "granted") {
+      alert("Sorry, we need permissions to access your camera and photos!");
       return;
     }
 
-    // Launch either the camera or gallery
-    let result = await (fromCamera 
+    const result = await (fromCamera
       ? ImagePicker.launchCameraAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
           allowsEditing: true,
@@ -44,62 +44,77 @@ const UploadScreen = () => {
     );
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      uploadImageToS3(result.assets[0].uri);
+      setLoading(true);
+      const imageUri = result.assets[0].uri;
+      uploadImageToS3(imageUri);
     }
   };
 
-  // Function to upload the image to S3
   const uploadImageToS3 = async (uri: string) => {
     try {
       const response = await fetch(uri);
       const blob = await response.blob();
+      const hash = uri.substring(uri.lastIndexOf("/") + 1);
 
-      // Generate a unique MD5 hash for the file name
-      const hash = md5.hex_md5(uri);
-      console.log("Generated MD5 Hash:", hash);
-
-      // Define S3 upload parameters
       const params: AWS.S3.PutObjectRequest = {
         Bucket: "upload-test-using-s3",
         Key: `${hash}.jpg`,
-        ContentType: 'image/jpeg',
-        Body: blob, 
+        ContentType: "image/jpeg",
+        Body: blob,
       };
 
-      // Upload the image to S3
       s3.upload(params, (err: Error, data: AWS.S3.ManagedUpload.SendData) => {
+        setLoading(false);
         if (err) {
-          console.error('Error uploading to S3:', err);
+          console.error("Error uploading to S3:", err);
         } else {
-          console.log('Upload successful:', data.Location);
+          console.log("Upload successful:", data.Location);
+          onUploadSuccess(data.Location);
         }
       });
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:", error);
+      setLoading(false);
     }
   };
 
+  const showUploadOptions = () => {
+    Alert.alert(
+      "Upload Image",
+      "Choose an option",
+      [
+        { text: "Take a Picture", onPress: () => handleImagePick(true) },
+        { text: "Choose from Gallery", onPress: () => handleImagePick(false) },
+        { text: "Cancel", style: "cancel" },
+      ]
+    );
+  };
+
   return (
-    <View style={styles.container}>
-      <Button title="Take a Photo" onPress={() => pickImage(true)} />
-      <Button title="Pick from Gallery" onPress={() => pickImage(false)} />
-      {image && <Image source={{ uri: image }} style={styles.image} />}
-    </View>
+    <TouchableOpacity
+      style={styles.uploadButton}
+      onPress={showUploadOptions}
+      disabled={loading}
+    >
+      <Text style={styles.uploadText}>{loading ? "..." : "+"}</Text>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+  uploadButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#000000",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 3,
   },
-  image: {
-    width: 200,
-    height: 200,
-    marginTop: 20,
+  uploadText: {
+    fontSize: 30,
+    color: "#fff",
   },
 });
 
-export default UploadScreen;
+export default Upload;

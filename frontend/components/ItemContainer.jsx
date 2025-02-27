@@ -6,21 +6,14 @@ import {MaterialIcons} from "@expo/vector-icons";
 const ItemContainer = ({ clothingItem, isFavorited, toggleFavorite }) => {
   const [imageSource, setImageSource] = useState(null);
   const [loading, setLoading] = useState(true);
-  
-    useEffect(() => {
-      if (clothingItem) {
-        try {
-          setImageSource(clothingItem); 
-        } catch (error) {
-          console.warn("Error loading image:", error);
-          setImageSource(require("../assets/images/shirt.png")); // Fallback image
-        }
-      } else {
-        setImageSource(require("../assets/images/shirt.png")); // Default placeholder
-      }
-      setLoading(false);
-    }, [clothingItem]);
 
+  useEffect(() => {
+    if (clothingItem) {
+      setImageSource(clothingItem); 
+    }
+    setLoading(false);
+  }, [clothingItem]);
+  
     return (
         <View style={styles.box}>
            <Pressable style={styles.iconContainer} onPress={toggleFavorite}>
@@ -62,8 +55,8 @@ const styles = StyleSheet.create({
       padding: 4,
   },
     image: {
-        width: "100%",
-        height: "100%",
+        width: "75%",
+        height: "75%",
         borderRadius: 10,
     },
 });
