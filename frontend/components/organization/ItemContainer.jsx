@@ -1,5 +1,5 @@
 import { View, Image, StyleSheet, ActivityIndicator, Pressable } from 'react-native'; 
-import theme from "../styles/theme";
+import theme from "../../styles/theme";
 import React, { useState, useEffect } from "react";
 import {MaterialIcons} from "@expo/vector-icons";
 
