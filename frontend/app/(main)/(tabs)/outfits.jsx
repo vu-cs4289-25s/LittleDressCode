@@ -1,12 +1,21 @@
-import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
-import { Link } from 'expo-router'; // For navigation
-import { MaterialIcons } from '@expo/vector-icons'; // For icons
+import React from "react";
+import { View, Text, StyleSheet, Button } from "react-native";
+import { Link } from "expo-router"; // For navigation
+import { MaterialIcons } from "@expo/vector-icons"; // For icons
+import Header from "@/components/Header";
 
 const OutfitScreen = () => {
+  const handleSearch = () => {
+    // When a user is typing in the search bar
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Outfit page</Text>
+      <Header
+        title={"My Outfits"}
+        // onPress={}
+        handleTextChange={handleSearch}
+      />
     </View>
   );
 };
@@ -15,24 +24,22 @@ const OutfitScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
+    padding: 16, 
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginBottom: 30,
-    textAlign: 'center',
+    textAlign: "center",
   },
   actions: {
-    width: '100%',
+    width: "100%",
     gap: 10,
   },
   icon: {

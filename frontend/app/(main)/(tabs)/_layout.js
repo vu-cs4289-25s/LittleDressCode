@@ -1,8 +1,8 @@
 import { Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
-import { HapticTab } from "../../../components/HapticTab"
-import { useColorScheme } from "../../../hooks/useColorScheme"
+import { HapticTab } from "../../../components/HapticTab";
+import { useColorScheme } from "../../../hooks/useColorScheme";
 import theme from "../../../styles/theme";
 import {
   FontAwesome,
@@ -28,21 +28,23 @@ export default function TabLayout() {
         tabBarStyle: Platform.select({
           ios: {
             // Use a transparent background on iOS to show the blur effect
-            position: "absolute",
-            flexDirection: "column", 
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            height: 60,
-            paddingBottom: 5,
+            height: 90,
           },
           default: {
-            height: 70,
+            flexDirection: "row", 
+            alignItems: "center", 
+            height: 90, 
           },
         }),
         tabBarIconStyle: {
-          flexDirection: "column", 
+          display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
+          height: 35,
         },
       }}
     >

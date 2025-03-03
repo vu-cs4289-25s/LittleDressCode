@@ -10,7 +10,7 @@ import theme from "../../styles/theme";
     <Button title="Medium Button" size="medium" color="dark" onPress={handlePress} />
     <Button title="Large Button" size="large" color="dark" onPress={handlePress} />
 */
-const Button = ({ title, onPress, size = "medium", color = "dark" }) => {
+const TextButton = ({ title, onPress, size = "medium", color = "dark" }) => {
   const buttonStyle = [styles.button, styles[size], styles[color]];
   const textStyle = [styles[`${color}Text`]];
 
@@ -59,4 +59,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Button;
+export default TextButton;

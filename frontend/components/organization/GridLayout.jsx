@@ -1,6 +1,7 @@
 import React from "react";
 import { View, FlatList, StyleSheet } from "react-native";
-import ItemContainer from "./ItemContainer"; // Your clothing item component
+import ItemContainer from "./ItemContainer" // Your clothing item component
+
 
 const GridLayout = ({ data, numColumns = 2 }) => {
     return (

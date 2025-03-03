@@ -38,9 +38,9 @@ const theme = {
     //tbd
   },
   spacing: {
-    small: 8,
-    medium: 13,
-    large: 16,
+    small: 6,
+    medium: 8,
+    large: 10,
   },
 
   borderRadius: {
