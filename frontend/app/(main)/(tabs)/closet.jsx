@@ -40,6 +40,8 @@ const ClosetScreen = () => {
       { id: prevData.length + 1, image: { uri: url } },
     ]);
 
+
+    // Need to add remove Background here, temporary hosting?
     // Navigate to the AddItem screen with the image URL as a parameter
     router.push({
       pathname: "/closet/AddItem",
