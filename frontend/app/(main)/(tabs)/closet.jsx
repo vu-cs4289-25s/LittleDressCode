@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import GridLayout from "../../../components/organization/GridLayout"; // Import the GridLayout component
+import GridLayout from "../../../components/organization/GridLayout";
 import { uploadImage } from "../../utils/upload";
 import Header from "@/components/Header";
 import dummy1 from "../../../assets/images/dummy/img-1.png";
@@ -11,6 +11,7 @@ import dummy5 from "../../../assets/images/dummy/img-5.png";
 import dummy6 from "../../../assets/images/dummy/img-6.png";
 import dummy7 from "../../../assets/images/dummy/img-7.png";
 import dummy8 from "../../../assets/images/dummy/img-8.png";
+import { useRouter } from "expo-router"; 
 
 const dummyStartData = [
   dummy1,
@@ -39,8 +40,8 @@ const ClosetScreen = () => {
       { id: prevData.length + 1, image: { uri: url } },
     ]);
 
-    // Need to add remove Background here, temporary hosting?
 
+    // Need to add remove Background here, temporary hosting?
     // Navigate to the AddItem screen with the image URL as a parameter
     router.push({
       pathname: "/closet/AddItem",
