@@ -23,25 +23,33 @@ const dummyStartData = [
   dummy8,
 ];
 
+
 const ClosetScreen = () => {
-  // Initializing with dummy data for now
+  const router = useRouter(); // Initialize the router
   const [clothingData, setClothingData] = useState(
     dummyStartData.map((image, index) => ({
-      id: index + 1, 
-      image: image, 
+      id: index + 1,
+      image: image,
     }))
-  ); 
+  );
 
-  // Handle upload success, assigning a unique incrementing ID
   const handleUploadSuccess = (url) => {
     setClothingData((prevData) => [
       ...prevData,
       { id: prevData.length + 1, image: { uri: url } },
     ]);
+
+    // Need to add remove Background here, temporary hosting?
+
+    // Navigate to the AddItem screen with the image URL as a parameter
+    router.push({
+      pathname: "/closet/AddItem",
+      params: { imageUrl: url },
+    });
   };
 
   const handleSearch = () => {
-    // When a user is typing in the search bar
+    // Handle search functionality
   };
 
   return (
@@ -60,7 +68,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    padding: 16, // Matches the 16px gap
+    padding: 16,
   },
   title: {
     fontSize: 24,

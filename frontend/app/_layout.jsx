@@ -29,15 +29,17 @@ const AuthCheck = () => {
   return (
     <SafeAreaProvider>
       <Stack screenOptions={{ headerShown: false }}>
-        {user === null ? ( 
-          <>
-            <Stack.Screen name="(auth)/welcome" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
-          </>
-        ) : (
-          <Stack.Screen name="(main)/(tabs)" options={{ headerShown: false }} />
-        )}
+      {!user ? ( 
+  <>
+
+    <Stack.Screen name="welcome" options={{ headerShown: false }} />
+    <Stack.Screen name="login" options={{ headerShown: false }} />
+    <Stack.Screen name="register" options={{ headerShown: false }} />
+    
+  </>
+) : (
+  <Stack.Screen name="(main)/(tabs)" options={{ headerShown: false }} />
+)}
       </Stack>
       <Toast />
     </SafeAreaProvider>
