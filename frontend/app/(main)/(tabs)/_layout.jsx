@@ -1,9 +1,6 @@
 import { Tabs } from "expo-router";
-import React from "react";
 import { Platform } from "react-native";
-import { HapticTab } from "../../../components/HapticTab";
-import { useColorScheme } from "../../../hooks/useColorScheme";
-import theme from "../../../styles/theme";
+import theme from "../../../styles/theme"; // Adjust path if needed
 import {
   FontAwesome,
   Entypo,
@@ -12,31 +9,23 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 
-export default function TabLayout() {
-  // Themed colors for navigation:
-  const colorScheme = useColorScheme();
-  const currentLocation = colorScheme === "dark";
-
+export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: currentLocation
-          ? theme.colors.icons.medium
-          : theme.colors.icons.dark,
+        tabBarActiveTintColor: theme.colors.icons.medium,
         headerShown: false,
-        tabBarButton: HapticTab,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             height: 90,
           },
           default: {
-            flexDirection: "row", 
-            alignItems: "center", 
-            height: 90, 
+            flexDirection: "row",
+            alignItems: "center",
+            height: 90,
           },
         }),
         tabBarIconStyle: {
@@ -57,7 +46,6 @@ export default function TabLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="closet"
         options={{
@@ -76,7 +64,6 @@ export default function TabLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="collections"
         options={{
