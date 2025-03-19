@@ -13,11 +13,10 @@ const RegisterScreen = () => {
   const [password, setPassword] = useState("");
   const [fname, setFname] = useState("");
   const [lname, setLname] = useState("");
-  const [agree, setAgree] = useState(false);
   const router = useRouter();
 
   const handleRegister = async () => {
-    if (!email || !password || !fname || !lname || !agree) {
+    if (!email || !password || !fname || !lname ) {
       Alert.alert("Error", "Please fill in all fields and agree to terms.");
       return;
     }
@@ -74,8 +73,8 @@ const RegisterScreen = () => {
         />
 
         <TouchableOpacity
-          style={[styles.registerButton, (!agree || !email || !password || !fname || !lname) && styles.disabledButton]}
-          disabled={!agree || !email || !password || !fname || !lname}
+          style={[styles.registerButton, ( !email || !password || !fname || !lname) && styles.disabledButton]}
+          disabled={ !email || !password || !fname || !lname}
           onPress={handleRegister}
         >
           <Text style={styles.registerButtonText}>Register</Text>
