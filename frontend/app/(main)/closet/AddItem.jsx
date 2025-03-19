@@ -1,110 +1,95 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
-  StyleSheet,
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  StyleSheet,
+  Text,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router"; 
-import AccordionView from "../../../components/AcordianView";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import AccordionView from "../../../components/AccordionView"; 
 import theme from "../../../styles/theme";
+import { addClothingItem } from "../../utils/clothingService"; 
 
 const AddItem = () => {
-  const { imageUrl } = useLocalSearchParams(); // Access the imageUrl parameter
-  const router = useRouter(); 
+  const { imageUrl } = useLocalSearchParams();
+  const router = useRouter();
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedButtons, setSelectedButtons] = useState({});
-
+  const [selectedButtons, setSelectedButtons] = useState({}); 
 
   useEffect(() => {
     setTimeout(() => {
       setSections([
-        {
-          id: 1,
-          title: "Category",
-          buttons: [
-            { label: "Tops", onPress: () => console.log("Tops clicked") },
-            { label: "Pants", onPress: () => console.log("Pants clicked") },
-            { label: "Skirts", onPress: () => console.log("Skirts clicked") },
-            { label: "Dresses", onPress: () => console.log("Dresses clicked") },
-            { label: "Bags", onPress: () => console.log("Bags clicked") },
-            { label: "Shoes", onPress: () => console.log("Shoes clicked") },
-            { label: "Outwear", onPress: () => console.log("Outwear clicked") },
-            { label: "Jewelry", onPress: () => console.log("Jewelry clicked") },
-            { label: "Hats", onPress: () => console.log("Hats clicked") },
-          ],
-        },
-        {
-          id: 2,
-          title: "Color",
-          buttons: [
-            { label: "Red", onPress: () => console.log("Red Clicked") },
-          ],
-        },
-        {
-          id: 3,
-          title: "Style",
-          buttons: [
-            { label: "Casual", onPress: () => console.log("Style!") },
-          ],
-        },
-        {
-          id: 4,
-          title: "Season",
-          buttons: [
-            { label: "Fall", onPress: () => console.log("Fall") },
-          ],
-        },
-        {
-          id: 5,
-          title: "Fit",
-          buttons: [
-            { label: "Loose", onPress: () => console.log("Loose") },
-          ],
-        },
+        { id: 1, title: "Category", buttons: [{ label: "Tops" }, { label: "Pants" }, { label: "Skirts" }, { label: "Dresses" }, { label: "Bags" }, { label: "Shoes" }, { label: "Outerwear" }, { label: "Jewelry" }, { label: "Hats" }] },
+        { id: 2, title: "Color", buttons: [{ label: "Red" }, { label: "Blue" }, { label: "Black" }, { label: "White" }, { label: "Green" }, { label: "Yellow" }, { label: "Pink" }] },
+        { id: 3, title: "Style", buttons: [{ label: "Casual" }, { label: "Formal" }, { label: "Sporty" }, { label: "Streetwear" }, { label: "Boho" }] },
+        { id: 4, title: "Season", buttons: [{ label: "Spring" }, { label: "Summer" }, { label: "Fall" }, { label: "Winter" }] },
+        { id: 5, title: "Fit", buttons: [{ label: "Tight" }, { label: "Regular" }, { label: "Loose" }, { label: "Oversized" }] },
       ]);
       setLoading(false);
     }, 0);
   }, []);
 
-
-  const handleSelectButton = (sectionId, buttonLabel) => {
-    setSelectedButtons((prev) => {
-      const currentSelection = prev[sectionId] || [];
-
-     
-      const updatedSelection = currentSelection.includes(buttonLabel)
-        ? currentSelection.filter((label) => label !== buttonLabel)
-        : [...currentSelection, buttonLabel];
-
-      return { ...prev, [sectionId]: updatedSelection };
-    });
+  // ✅ Fix tag selection (track individual selections per category)
+  const handleSelectButton = (categoryId, tag) => {
+    setSelectedButtons((prev) => ({
+      ...prev,
+      [categoryId]: prev[categoryId]?.includes(tag)
+        ? prev[categoryId].filter((selected) => selected !== tag) // Deselect if already selected
+        : [...(prev[categoryId] || []), tag], // Select if not already selected
+    }));
   };
 
-  const goBackToCloset = () => {
-    router.back(); 
+  // ✅ Save to Firestore
+  const saveClothingItem = async () => {
+    const userId = "testUser123"; // Replace with real user ID
+
+    const clothingData = {
+      userId,
+      name: "New Clothing Item",
+      category: selectedButtons[1] || [],
+      color: selectedButtons[2] || [],
+      style: selectedButtons[3] || [],
+      season: selectedButtons[4] || [],
+      fit: selectedButtons[5] || [],
+      imageUrl,
+    };
+
+    try {
+      await addClothingItem(
+        clothingData.userId,
+        clothingData.name,
+        clothingData.category,
+        clothingData.color,
+        clothingData.style,
+        clothingData.season,
+        clothingData.fit,
+        clothingData.imageUrl
+      );
+      console.log("Clothing item saved successfully!");
+      router.back();
+    } catch (error) {
+      console.error("Error saving clothing item:", error);
+    }
   };
 
   return (
     <View style={styles.container}>
       <Image source={{ uri: imageUrl }} style={styles.image} />
 
-      {/* Show AccordionView */}
       {loading ? (
         <ActivityIndicator size="large" color="blue" />
       ) : (
         <AccordionView
           sections={sections}
-          selectedButtons={selectedButtons}
-          onSelectButton={handleSelectButton}
+          selectedButtons={selectedButtons} 
+          onSelectButton={handleSelectButton} 
         />
       )}
 
-
-      <TouchableOpacity style={styles.saveButton} onPress={goBackToCloset}>
+      <TouchableOpacity style={styles.saveButton} onPress={saveClothingItem}>
         <Text style={styles.saveButtonText}>Add Item</Text>
       </TouchableOpacity>
     </View>
@@ -134,7 +119,7 @@ const styles = StyleSheet.create({
     marginBottom: 90,
   },
   saveButtonText: {
-    color: theme.colors.text.lightest, 
+    color: theme.colors.text.lightest,
     fontSize: 16,
     fontWeight: "bold",
   },

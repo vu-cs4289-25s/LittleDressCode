@@ -21,11 +21,11 @@ export const addClothingItem = async (
       season: Array.isArray(season) ? season : [season],
       fit: Array.isArray(fit) ? fit : [fit],
       imageUrl,
-      outfits: [], // Empty initially
+      outfits: [], // Initialize empty array
       createdAt: new Date(),
     });
     return docRef.id;
   } catch (error) {
-    console.error("Error adding clothing item: ", error);
+    console.error("Error adding clothing item:", error);
   }
 };
