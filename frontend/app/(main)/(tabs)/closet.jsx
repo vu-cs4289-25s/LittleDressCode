@@ -3,14 +3,14 @@ import { View, Text, StyleSheet } from "react-native";
 import GridLayout from "../../../components/organization/GridLayout";
 import { uploadImage } from "../../utils/upload";
 import Header from "@/components/Header";
-import dummy1 from "../../../assets/images/dummy/img-1.png";
-import dummy2 from "../../../assets/images/dummy/img-2.png";
-import dummy3 from "../../../assets/images/dummy/img-3.png";
-import dummy4 from "../../../assets/images/dummy/img-4.png";
-import dummy5 from "../../../assets/images/dummy/img-5.png";
-import dummy6 from "../../../assets/images/dummy/img-6.png";
-import dummy7 from "../../../assets/images/dummy/img-7.png";
-import dummy8 from "../../../assets/images/dummy/img-8.png";
+import dummy1 from "../../../assets/images/dummy/clothing/img-1.png";
+import dummy2 from "../../../assets/images/dummy/clothing/img-2.png";
+import dummy3 from "../../../assets/images/dummy/clothing/img-3.png";
+import dummy4 from "../../../assets/images/dummy/clothing/img-4.png";
+import dummy5 from "../../../assets/images/dummy/clothing/img-5.png";
+import dummy6 from "../../../assets/images/dummy/clothing/img-6.png";
+import dummy7 from "../../../assets/images/dummy/clothing/img-7.png";
+import dummy8 from "../../../assets/images/dummy/clothing/img-8.png";
 import { useRouter } from "expo-router"; 
 
 const dummyStartData = [
