@@ -85,9 +85,14 @@ const RegisterScreen = () => {
           <Text style={styles.orText}>OR</Text>
           <View style={styles.separator} />
         </View>
-
-        <TouchableOpacity style={styles.googleButton}>
-          <Text style={styles.googleButtonText}>Continue with Google</Text>
+        <TouchableOpacity
+          style={(!email || !password || !fname || !lname)
+          ? [styles.registerButton, styles.disabledButton]
+          : styles.registerButton}
+          disabled={!email || !password || !fname || !lname}
+          onPress={handleRegister}
+        >
+          <Text style={styles.registerButtonText}>Register</Text>
         </TouchableOpacity>
       </View>
     </View>

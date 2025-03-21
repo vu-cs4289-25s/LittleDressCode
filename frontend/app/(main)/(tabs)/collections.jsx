@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, ActivityIndicator, TouchableOpacity, Text, StyleSheet } from "react-native";
-import AccordionView from "../../../components/AcordianView";
+import AccordionView from "../../../components/AccordionView";
 import theme from "../../../styles/theme";
 
 const CollectionScreen = () => {

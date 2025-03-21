@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Image, View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import theme from "../../styles/theme.js";
 import { Stack, useRouter } from "expo-router";
-import { signIn, signInWithGoogle } from "./authService"; ;
+import { signIn } from "./authService";
+import { useGoogleSignIn } from "./authService"; // ✅ Import fixed Google Sign-In Hook
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { request, promptAsync } = useGoogleSignIn(); // ✅ Use Google Sign-In Hook
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -25,15 +27,16 @@ export default function LoginPage() {
   
   const handleGoogleSignIn = async () => {
     try {
-      const user = await signInWithGoogle();
-      Alert.alert("Success", "Google Sign-in successful!");
-      router.replace("/(main)"); // ✅ Navigate to Main
+      if (!request) {
+        Alert.alert("Error", "Google Sign-In is not available.");
+        return;
+      }
+      await promptAsync(); // ✅ Trigger Google Sign-In
     } catch (error) {
       Alert.alert("Google Sign-in Error", error.message);
     }
   };
   
-
   return (
     <>
       <Stack.Screen options={{ title: "Login", headerBackTitleVisible: false, headerShown: false }} />
@@ -43,7 +46,8 @@ export default function LoginPage() {
         </View>
         <Text style={styles.title}>Let's get started</Text>
 
-        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
+        {/* ✅ Google Sign-In Button Fixed */}
+        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn} disabled={!request}>
           <Text style={styles.googleButtonText}>Sign in with Google</Text>
         </TouchableOpacity>
 
@@ -176,6 +180,3 @@ const styles = StyleSheet.create({
       fontWeight: "bold",
   },
 });
-
-
-
