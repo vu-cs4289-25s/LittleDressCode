@@ -9,7 +9,7 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const AccordionView = ({ sections, selectedButtons, onSelectButton }) => {
+const AccordionView = ({ title = "The Basics", sections, selectedButtons, onSelectButton }) => {
   const [activeSections, setActiveSections] = useState([]);
 
   const handleUpdateSections = (sections) => {

@@ -1,41 +1,66 @@
 import React from "react";
 import { Platform, View, Text, StyleSheet } from "react-native";
-import theme from "../styles/theme";
+import { SafeAreaView } from "react-native-safe-area-context";
 import AddButton from "./common/AddButton";
 import TextField from "./common/Textfield";
+import BackButton from "./common/BackButton";
 
-const Header = ({ title, onPress, handleTextChange }) => {
+const Header = ({
+  title,
+  onPress,
+  handleTextChange,
+  showBackButton = false,
+  backTo = null,
+  showSearch = true,
+}) => {
   return (
-    <View style={styles.container}>
-      <View style={styles.main}>
-        <Text style={styles.title}>{title}</Text>
-        <AddButton onPress={onPress} />
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.main}>
+          <View style={styles.titleRow}>
+            {showBackButton && <BackButton to={backTo} />}
+            <Text style={styles.title}>{title}</Text>
+          </View>
+          {onPress && <AddButton onPress={onPress} />}
+        </View>
+
+        {showSearch && (
+          <TextField
+            icon={"search"}
+            placeholder="Search items"
+            size="large"
+            onChangeText={handleTextChange}
+          />
+        )}
       </View>
-      <TextField
-        icon={"search"}
-        placeholder="Search items"
-        size="large"
-        onChangeText={handleTextChange}
-      />
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    backgroundColor: "white",
+  },
+  container: {
+    padding: 12,
+    gap: 8,
+  },
   main: {
-    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingTop: Platform.OS === "web" ? 16 : 50,
+    paddingTop: 0,
   },
-  container: {
-    padding: 16,
-    gap: 8,
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
   },
   title: {
-    fontSize: theme.fonts.size.large,
-    fontWeight: "bold",
+    fontSize: 25,
+    fontWeight: "600",
+    paddingLeft: 4,
+    lineHeight: 33,
   },
 });
 
