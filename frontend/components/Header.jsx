@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   title: {
-    fontSize: 30,
+    fontSize: theme.fonts.size.large,
     fontWeight: "bold",
   },
 });
