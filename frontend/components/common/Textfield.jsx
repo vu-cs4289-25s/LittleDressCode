@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   medium: {
     paddingVertical: theme.spacing.medium,
     paddingHorizontal: theme.spacing.medium,
-    width: "200px",
+    width: "100%",
   },
   large: {
     paddingVertical: theme.spacing.large,
