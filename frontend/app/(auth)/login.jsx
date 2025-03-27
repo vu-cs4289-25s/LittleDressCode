@@ -1,9 +1,18 @@
 import React, { useState } from "react";
-import { Image, View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
+import {
+  Image,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import theme from "../../styles/theme.js";
 import { Stack, useRouter } from "expo-router";
 import { signIn } from "./authService";
 import { useGoogleSignIn } from "./authService"; // ✅ Import fixed Google Sign-In Hook
+import TextField from "@/components/common/Textfield.jsx";
+import TextButton from "@/components/common/TextButton.jsx";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,7 +33,7 @@ export default function LoginPage() {
       Alert.alert("Login Error", error.message);
     }
   };
-  
+
   const handleGoogleSignIn = async () => {
     try {
       if (!request) {
@@ -36,53 +45,66 @@ export default function LoginPage() {
       Alert.alert("Google Sign-in Error", error.message);
     }
   };
-  
+
   return (
     <>
-      <Stack.Screen options={{ title: "Login", headerBackTitleVisible: false, headerShown: false }} />
+      <Stack.Screen
+        options={{
+          title: "Login",
+          headerBackTitleVisible: false,
+          headerShown: false,
+        }}
+      />
       <View style={styles.container}>
-        <View style={styles.logoContainer}>
-          <Image source={require("./../../assets/images/logo.png")} style={styles.logo} />
-        </View>
-        <Text style={styles.title}>Let's get started</Text>
-
-        {/* ✅ Google Sign-In Button Fixed */}
-        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn} disabled={!request}>
-          <Text style={styles.googleButtonText}>Sign in with Google</Text>
-        </TouchableOpacity>
-
-        <View style={styles.orSeparator}>
-          <View style={styles.separatorLine} />
-          <Text style={styles.orText}>OR</Text>
-          <View style={styles.separatorLine} />
+        <View style={styles.loginHeader}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require("./../../assets/images/logo.png")}
+              style={styles.logo}
+            />
+          </View>
+          <Text style={styles.title}>Let's get started</Text>
         </View>
 
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor={theme.colors.text.medium}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
+          <TextButton
+            title="Sign in with Google"
+            size="large"
+            color="light"
+            onPress={handleGoogleSignIn}
+            disabled={!request}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor={theme.colors.text.medium}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
+          <View style={styles.orSeparator}>
+            <View style={styles.separatorLine} />
+            <Text style={styles.orText}>OR</Text>
+            <View style={styles.separatorLine} />
+          </View>
+          <View style={styles.inputFields}>
+            <TextField
+              placeholder="Email"
+              size="large"
+              onChangeText={setEmail}
+            />
+            <TextField
+              placeholder="Password"
+              size="large"
+              secure={true}
+              onChangeText={setPassword}
+            />
+          </View>
+          <TextButton
+            title="Log In"
+            size="large"
+            color="dark"
+            onPress={handleLogin}
           />
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>Log In</Text>
+        </View>
+        <View style={styles.registerLine}>
+          <Text>Don’t have an account yet? </Text>
+          <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
+            <Text style={styles.registerLinkText}>Register</Text>
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-          <Text style={styles.registerLinkText}> Register</Text>
-        </TouchableOpacity>
       </View>
     </>
   );
@@ -90,93 +112,65 @@ export default function LoginPage() {
 
 const styles = StyleSheet.create({
   container: {
-      flex: 1,
-      backgroundColor: theme.colors.backgrounds.primary,
-      paddingHorizontal: 20,
-      justifyContent: "center",
-      alignItems: "center",
+    flex: 1,
+    backgroundColor: theme.colors.backgrounds.primary,
+    paddingHorizontal: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loginHeader: {
+    marginBottom: 20,
   },
   logoContainer: {
-      alignItems: "center",
-      marginBottom: theme.spacing.large,
+    alignItems: "center",
+    marginBottom: theme.spacing.large,
   },
   logo: {
-      height: 80,
-      width: 80,
-      borderRadius: theme.borderRadius.default,
-      backgroundColor: theme.colors.neutral.gray, // Placeholder color for logo
-      justifyContent: "center",
-      alignItems: "center",
+    height: 80,
+    width: 80,
+    borderRadius: theme.borderRadius.default,
+    backgroundColor: theme.colors.neutral.gray, // Placeholder color for logo
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
-      fontSize: 22,
-      fontWeight: "bold",
-      color: theme.colors.text.dark, // More contrast for better readability
-      marginBottom: theme.spacing.large,
-  },
-  googleButton: {
-      backgroundColor: theme.colors.neutral.gray,
-      paddingVertical: theme.spacing.medium,
-      borderRadius: theme.borderRadius.small,
-      alignItems: "center",
-      width: "85%",
-      marginBottom: theme.spacing.medium,
-      borderWidth: 1,
-      borderColor: theme.colors.icons.light,
-  },
-  googleButtonText: {
-      color: theme.colors.text.dark,
-      fontSize: 16,
-      fontWeight: "600",
+    fontSize: theme.fonts.size.large,
+    fontWeight: "bold",
+    color: theme.colors.text.dark, // More contrast for better readability
+    marginBottom: theme.spacing.large,
   },
   orSeparator: {
-      flexDirection: "row",
-      alignItems: "center",
-      width: "85%",
-      marginVertical: theme.spacing.medium,
+    flexDirection: "row",
+    alignItems: "center",
+    width: "85%",
+    marginVertical: theme.spacing.medium,
   },
   separatorLine: {
-      flex: 1,
-      height: 1,
-      backgroundColor: theme.colors.icons.light,
+    flex: 1,
+    height: 1,
+    backgroundColor: theme.colors.icons.light,
+  },
+  inputFields: {
+    width: "100%",
+    alignItems: "center",
   },
   orText: {
-      marginHorizontal: 10,
-      color: theme.colors.text.medium,
-      fontWeight: "600",
+    marginHorizontal: 10,
+    color: theme.colors.text.medium,
+    fontWeight: "600",
   },
   inputContainer: {
-      width: "85%",
-      marginBottom: theme.spacing.large,
-  },
-  input: {
-      backgroundColor: theme.colors.backgrounds.secondary,
-      borderWidth: 1,
-      borderColor: theme.colors.icons.light,
-      borderRadius: theme.borderRadius.small,
-      paddingVertical: theme.spacing.medium,
-      paddingHorizontal: theme.spacing.large,
-      marginBottom: theme.spacing.medium,
-      fontSize: 16,
-      color: theme.colors.text.dark,
-  },
-  loginButton: {
-      backgroundColor: theme.colors.primary.pink,
-      paddingVertical: theme.spacing.medium,
-      borderRadius: theme.borderRadius.small,
-      alignItems: "center",
-      width: "85%",
-      marginBottom: theme.spacing.medium,
-  },
-  loginButtonText: {
-      color: theme.colors.text.lightest,
-      fontSize: 16,
-      fontWeight: "bold",
+    width: "85%",
+    alignItems: "center",
+    marginBottom: theme.spacing.large,
+    gap: 20,
   },
   registerLinkText: {
-      marginTop: theme.spacing.medium,
-      color: theme.colors.primary.blue,
-      fontSize: 16,
-      fontWeight: "bold",
+    fontSize: 15,
+    fontWeight: "bold",
+  },
+  registerLine: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
