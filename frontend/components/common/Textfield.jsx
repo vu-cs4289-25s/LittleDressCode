@@ -24,7 +24,7 @@ import { MaterialIcons } from "@expo/vector-icons";
     />;
 */
 
-const TextField = ({ icon, placeholder, size = "large", onChangeText }) => {
+const TextField = ({ icon, placeholder, size = "large", onChangeText, secure = false  }) => {
   const inputStyle = [styles.input, styles[size]];
 
   return (
@@ -42,6 +42,8 @@ const TextField = ({ icon, placeholder, size = "large", onChangeText }) => {
         placeholder={placeholder}
         onChangeText={onChangeText}
         placeholderTextColor={theme.colors.text.light}
+        secureTextEntry={secure}
+
       />
     </View>
   );
@@ -52,7 +54,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: theme.spacing.large,
+    paddingVertical: theme.spacing.small,
   },
   small: {
     paddingVertical: theme.spacing.small,
