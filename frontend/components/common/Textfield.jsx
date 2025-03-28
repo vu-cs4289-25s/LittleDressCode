@@ -24,7 +24,13 @@ import { MaterialIcons } from "@expo/vector-icons";
     />;
 */
 
-const TextField = ({ icon, placeholder, size = "large", onChangeText, secure = false  }) => {
+const TextField = ({
+  icon,
+  placeholder,
+  size = "large",
+  onChangeText,
+  secure = false,
+}) => {
   const inputStyle = [styles.input, styles[size]];
 
   return (
@@ -43,7 +49,7 @@ const TextField = ({ icon, placeholder, size = "large", onChangeText, secure = f
         onChangeText={onChangeText}
         placeholderTextColor={theme.colors.text.light}
         secureTextEntry={secure}
-
+        autoCapitalize="none"
       />
     </View>
   );

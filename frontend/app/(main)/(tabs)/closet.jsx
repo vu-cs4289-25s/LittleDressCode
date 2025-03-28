@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import GridLayout from "../../../components/organization/GridLayout";
 import { uploadImage } from "../../utils/upload";
-import Header from "@/components/Header";
+import Header from "@/components/headers/Header";
 import dummy1 from "../../../assets/images/dummy/clothing/img-1.png";
 import dummy2 from "../../../assets/images/dummy/clothing/img-2.png";
 import dummy3 from "../../../assets/images/dummy/clothing/img-3.png";

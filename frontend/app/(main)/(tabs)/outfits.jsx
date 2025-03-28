@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import { View, StyleSheet } from "react-native";
 import GridLayout from "../../../components/organization/GridLayout"; // Import the GridLayout component
-import { uploadImage } from "../../utils/upload";
-import { Link, router } from "expo-router"; // For navigation
-import { MaterialIcons } from "@expo/vector-icons"; // For icons
-import Header from "@/components/Header";
+import { router } from "expo-router"; 
+import Header from "@/components/headers/Header";
 import dummy1 from "../../../assets/images/dummy/outfits/img-1.png";
 import dummy2 from "../../../assets/images/dummy/outfits/img-2.png";
 import dummy3 from "../../../assets/images/dummy/outfits/img-3.png";
@@ -34,7 +32,7 @@ const OutfitScreen = () => {
   };
 
   const handleNewOutfit = () => {
-    router.push('/NewOutfit')
+    router.push('outfits/NewOutfit')
   }
 
 
@@ -44,7 +42,7 @@ const OutfitScreen = () => {
         title={"My Outfits"}
         onPress={handleNewOutfit}
         handleTextChange={handleSearch}
-        link={"/outfits/NewOutfit"}
+        // link={"/outfits/NewOutfit"}
       />
       <GridLayout data={clothingData} numColumns={2} />
 

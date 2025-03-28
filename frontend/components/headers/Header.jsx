@@ -1,8 +1,8 @@
 import React from "react";
 import { Platform, View, Text, StyleSheet } from "react-native";
-import theme from "../styles/theme";
-import AddButton from "./common/AddButton";
-import TextField from "./common/Textfield";
+import theme from "../../styles/theme";
+import AddButton from "../buttons/AddButton";
+import TextField from "../common/Textfield";
 
 const Header = ({ title, onPress, handleTextChange }) => {
   return (
