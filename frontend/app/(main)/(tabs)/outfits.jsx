@@ -7,6 +7,10 @@ import Header from "@/components/Header";
 import theme from "@/styles/theme";
 
 // Dummy outfit images
+import { View, StyleSheet } from "react-native";
+import GridLayout from "../../../components/organization/GridLayout"; // Import the GridLayout component
+import { router } from "expo-router"; 
+import Header from "@/components/headers/Header";
 import dummy1 from "../../../assets/images/dummy/outfits/img-1.png";
 import dummy2 from "../../../assets/images/dummy/outfits/img-2.png";
 import dummy3 from "../../../assets/images/dummy/outfits/img-3.png";
@@ -18,6 +22,7 @@ const dummyStartData = [dummy1, dummy2, dummy3, dummy4, dummy5, dummy6];
 
 const OutfitScreen = () => {
   const { mode } = useLocalSearchParams();
+  const router = useRouter(); // Get the router object from expo-router
   const isSelectionMode = mode === "select";
 
   const [clothingData, setClothingData] = useState(
@@ -40,7 +45,7 @@ const OutfitScreen = () => {
   };
 
   const handleNewOutfit = () => {
-    router.push("/NewOutfit");
+    router.push('outfits/NewOutfit'); // Correct placement of router.push inside the function
   };
 
   const handleNext = () => {
@@ -60,7 +65,6 @@ const OutfitScreen = () => {
         handleTextChange={handleSearch}
       />
 
-
       <GridLayout
         data={clothingData}
         numColumns={2}
@@ -71,16 +75,17 @@ const OutfitScreen = () => {
         toggleFavorite={() => {}} // Optional for now
       />
 
-{isSelectionMode && selectedIds.length > 0 && (
-  <View style={styles.nextButtonContainer}>
-    <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-      <Text style={styles.nextButtonText}>
-        Next ({selectedIds.length})
-      </Text>
-    </TouchableOpacity>
-  </View>
-)}
-
+      {isSelectionMode && selectedIds.length > 0 && (
+        <View style={styles.nextButtonContainer}>
+          <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+            <Text style={styles.nextButtonText}>
+              Next ({selectedIds.length})
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      
+      <GridLayout data={clothingData} numColumns={2} />
     </View>
   );
 };
