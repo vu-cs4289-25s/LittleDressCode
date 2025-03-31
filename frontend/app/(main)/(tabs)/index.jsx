@@ -1,7 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
-import { Link } from 'expo-router'; // For navigation
-import { MaterialIcons } from '@expo/vector-icons'; // For icons
 
 const HomeScreen = () => {
   return (

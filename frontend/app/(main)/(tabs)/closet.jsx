@@ -8,7 +8,6 @@ import { useRouter } from "expo-router";
 import { getFilteredClothingItems } from "../../utils/clothingService";
 
 
-// ✅ Dummy images
 import dummy1 from "../../../assets/images/dummy/clothing/img-1.png";
 import dummy2 from "../../../assets/images/dummy/clothing/img-2.png";
 import dummy3 from "../../../assets/images/dummy/clothing/img-3.png";

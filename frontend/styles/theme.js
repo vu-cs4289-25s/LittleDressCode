@@ -35,7 +35,9 @@ const theme = {
     },
   },
   fonts: {
-    //tbd
+    size: {
+      large: 30
+    }
   },
   spacing: {
     small: 6,
