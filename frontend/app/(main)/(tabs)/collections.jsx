@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
-import AccordionView from "../../../components/AccordionView";
-import theme from "../../../styles/theme";
-import Header from "@/components/Header";
-import GridLayout from "../../../components/organization/GridLayout";
+import AccordionView from "@/components/AccordionView";
+import theme from "@/styles/theme";
+import Header from "@/components/headers/Header";
+import GridLayout from "@/components/organization/GridLayout";
 import { router } from "expo-router";
-import dummy1 from "../../../assets/images/dummy/outfits/img-1.png";
-import dummy2 from "../../../assets/images/dummy/outfits/img-2.png";
-import dummy3 from "../../../assets/images/dummy/outfits/img-3.png";
-import dummy4 from "../../../assets/images/dummy/outfits/img-4.png";
-import dummy5 from "../../../assets/images/dummy/outfits/img-5.png";
-import dummy6 from "../../../assets/images/dummy/outfits/img-6.png";
+import dummy1 from "@/assets/images/dummy/outfits/img-1.png";
+import dummy2 from "@/assets/images/dummy/outfits/img-2.png";
+import dummy3 from "@/assets/images/dummy/outfits/img-3.png";
+import dummy4 from "@/assets/images/dummy/outfits/img-4.png";
+import dummy5 from "@/assets/images/dummy/outfits/img-5.png";
+import dummy6 from "@/assets/images/dummy/outfits/img-6.png";
 
 const dummyStartData = [dummy1, dummy2, dummy3, dummy4, dummy5, dummy6];
 

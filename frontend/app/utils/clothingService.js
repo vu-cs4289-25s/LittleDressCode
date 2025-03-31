@@ -31,10 +31,6 @@ export const addClothingItem = async (
   }
 };
 
-// added this at  4:20 am: This fetches clothing items for the user, then applies filtering logic client-side.
-
-
-
 export const getFilteredClothingItems = async (userId, selectedFilters) => {
   try {
     const q = query(
