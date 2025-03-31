@@ -1,26 +1,30 @@
-import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
-import AccordionView from "@/components/AccordionView";
-import theme from "@/styles/theme";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Text,
+  FlatList,
+  Image,
+} from "react-native";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/app/utils/firebaseConfig";
 import Header from "@/components/headers/Header";
-import GridLayout from "@/components/organization/GridLayout";
+import theme from "@/styles/theme";
 import { router } from "expo-router";
-import dummy1 from "@/assets/images/dummy/outfits/img-1.png";
-import dummy2 from "@/assets/images/dummy/outfits/img-2.png";
-import dummy3 from "@/assets/images/dummy/outfits/img-3.png";
-import dummy4 from "@/assets/images/dummy/outfits/img-4.png";
-import dummy5 from "@/assets/images/dummy/outfits/img-5.png";
-import dummy6 from "@/assets/images/dummy/outfits/img-6.png";
 
-const dummyStartData = [dummy1, dummy2, dummy3, dummy4, dummy5, dummy6];
+const dummyImages = {
+  1: require("@/assets/images/dummy/outfits/img-1.png"),
+  2: require("@/assets/images/dummy/outfits/img-2.png"),
+  3: require("@/assets/images/dummy/outfits/img-3.png"),
+  4: require("@/assets/images/dummy/outfits/img-4.png"),
+  5: require("@/assets/images/dummy/outfits/img-5.png"),
+  6: require("@/assets/images/dummy/outfits/img-6.png"),
+};
+
 
 const CollectionScreen = () => {
-  const [clothingData, setClothingData] = useState(
-    dummyStartData.map((image, index) => ({
-      id: index + 1,
-      image: image,
-    }))
-  );
+  const [collections, setCollections] = useState([]);
 
   const handleSearch = () => {
     // search functionality
@@ -30,6 +34,20 @@ const CollectionScreen = () => {
     router.push("/outfits?mode=select");
   };
 
+  useEffect(() => {
+    const fetchCollections = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "collections"));
+        const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setCollections(data);
+      } catch (error) {
+        console.error("Error fetching collections:", error);
+      }
+    };
+
+    fetchCollections();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Header
@@ -37,7 +55,33 @@ const CollectionScreen = () => {
         onPress={handleNewOutfit}
         handleTextChange={handleSearch}
       />
-      <GridLayout data={clothingData} numColumns={2} />
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {collections.map((col) => (
+          <View key={col.id} style={styles.collectionSection}>
+            <View style={styles.collectionHeader}>
+              <Text style={styles.collectionTitle}>{col.name}</Text>
+            </View>
+            <FlatList
+              horizontal
+              data={col.outfits}
+              keyExtractor={(item, index) => `${col.id}-${item}-${index}`}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.outfitList}
+              renderItem={({ item }) => (
+                <View style={styles.outfitItem}>
+                  <Image
+                    source={dummyImages[item]} // ✅ dynamically load based on outfit ID
+                    style={styles.outfitImage}
+                    resizeMode="contain"
+                  />
+                </View>
+              
+              )}
+            />
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -47,6 +91,33 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.backgrounds.primary,
     paddingHorizontal: 16,
+  },
+  collectionSection: {
+    marginBottom: 24,
+  },
+  collectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  collectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  outfitList: {
+    paddingRight: 16,
+  },
+  outfitItem: {
+    marginRight: 12,
+    backgroundColor: theme.colors.backgrounds.secondary,
+    borderRadius: 12,
+    padding: 12,
+  },
+  outfitImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 10,
   },
 });
 

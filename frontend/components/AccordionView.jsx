@@ -57,7 +57,8 @@ const AccordionView = ({ title = "The Basics", sections, selectedButtons, onSele
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>The Basics</Text>
+      {title && <Text style={styles.title}>{title}</Text>}
+
 
       <Accordion
         sections={sections}
