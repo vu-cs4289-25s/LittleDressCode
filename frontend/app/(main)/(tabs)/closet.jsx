@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
-import GridLayout from "../../../components/organization/GridLayout";
-import { uploadImage } from "../../utils/upload";
-import Header from "@/components/Header";
-import FilterBar from "../../../components/common/FilterBar";
+import GridLayout from "@/components/organization/GridLayout";
+import { uploadImage } from "@/app/utils/upload";
+import Header from "@/components/headers/Header";
+import FilterBar from "@/components/common/FilterBar";
 import { useRouter } from "expo-router";
-import { getFilteredClothingItems } from "../../utils/clothingService";
+import { getFilteredClothingItems } from "@/app/utils/clothingService";
 
 
 import dummy1 from "../../../assets/images/dummy/clothing/img-1.png";

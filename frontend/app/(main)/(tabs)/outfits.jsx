@@ -1,15 +1,11 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Button, TouchableOpacity, Text } from "react-native";
 import GridLayout from "../../../components/organization/GridLayout";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useRouter, useLocalSearchParams } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
-import Header from "@/components/Header";
 import theme from "@/styles/theme";
 
 // Dummy outfit images
-import { View, StyleSheet } from "react-native";
-import GridLayout from "../../../components/organization/GridLayout"; // Import the GridLayout component
-import { router } from "expo-router"; 
 import Header from "@/components/headers/Header";
 import dummy1 from "../../../assets/images/dummy/outfits/img-1.png";
 import dummy2 from "../../../assets/images/dummy/outfits/img-2.png";

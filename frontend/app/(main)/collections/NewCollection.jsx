@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -7,19 +7,20 @@ import {
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { getAuth } from "firebase/auth";
+
+import Header from "@/components/headers/Header";
 import ItemContainer from "@/components/organization/ItemContainer";
-import Header from "@/components/Header";
 import TextField from "@/components/common/Textfield";
 import AccordionView from "@/components/AccordionView";
-import { addCollection } from "../../utils/collectionsService"; 
+import { addCollection } from "../../utils/collectionsService";
 
-// Dummy outfit images
 import dummy1 from "../../../assets/images/dummy/outfits/img-1.png";
 import dummy2 from "../../../assets/images/dummy/outfits/img-2.png";
 import dummy3 from "../../../assets/images/dummy/outfits/img-3.png";
 import dummy4 from "../../../assets/images/dummy/outfits/img-4.png";
 import dummy5 from "../../../assets/images/dummy/outfits/img-5.png";
 import dummy6 from "../../../assets/images/dummy/outfits/img-6.png";
+
 
 const dummyStartData = [
   { id: 1, image: dummy1 },
