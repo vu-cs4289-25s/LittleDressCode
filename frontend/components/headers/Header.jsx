@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import theme from "@/styles/theme";
 import AddButton from "../buttons/AddButton";
 import TextField from "../common/Textfield";
+import BackButton from "../common/BackButton";
 
 const Header = ({
   title,
