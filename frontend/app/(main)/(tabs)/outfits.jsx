@@ -80,8 +80,6 @@ const OutfitScreen = () => {
           </TouchableOpacity>
         </View>
       )}
-      
-      <GridLayout data={clothingData} numColumns={2} />
     </View>
   );
 };
