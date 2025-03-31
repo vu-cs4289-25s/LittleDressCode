@@ -1,5 +1,6 @@
 import { db } from "./firebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
+
 
 export const addClothingItem = async (
   userId,
@@ -27,5 +28,44 @@ export const addClothingItem = async (
     return docRef.id;
   } catch (error) {
     console.error("Error adding clothing item:", error);
+  }
+};
+
+// added this at  4:20 am: This fetches clothing items for the user, then applies filtering logic client-side.
+
+
+
+export const getFilteredClothingItems = async (userId, selectedFilters) => {
+  try {
+    const q = query(
+      collection(db, "clothingItems"),
+      where("userId", "==", userId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    const allItems = [];
+    querySnapshot.forEach((doc) => {
+      allItems.push({ id: doc.id, ...doc.data() });
+    });
+
+    if (selectedFilters.length === 0) return allItems;
+
+    // Apply client-side filter matching against tags
+    const filtered = allItems.filter((item) => {
+      const tags = [
+        ...(item.category || []),
+        ...(item.color || []),
+        ...(item.style || []),
+        ...(item.season || []),
+        ...(item.fit || []),
+      ];
+
+      return selectedFilters.every((filter) => tags.includes(filter));
+    });
+
+    return filtered;
+  } catch (error) {
+    console.error("Error fetching filtered clothing items:", error);
+    return [];
   }
 };

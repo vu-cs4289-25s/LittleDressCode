@@ -4,6 +4,7 @@ import ItemContainer from "./ItemContainer";
 
 const GridLayout = ({
   data,
+  dummyData = [],
   numColumns = 2,
   isSelectable = false,
   selectedIds = [],
@@ -11,15 +12,17 @@ const GridLayout = ({
   isFavorited = () => false,
   toggleFavorite = () => {},
 }) => {
+  const displayData = data.length > 0 ? data : dummyData;
+
   return (
     <FlatList
-      data={data}
-      keyExtractor={(item) => item.id.toString()}
+      data={displayData}
+      keyExtractor={(item, index) => item.id?.toString() || index.toString()}
       numColumns={numColumns}
       renderItem={({ item }) => (
         <View style={styles.gridItem}>
           <ItemContainer
-            clothingItem={item.image}
+            clothingItem={item.imageUrl || item.image}
             isFavorited={isFavorited(item.id)}
             toggleFavorite={() => toggleFavorite(item.id)}
             isSelectable={isSelectable}
@@ -45,6 +48,7 @@ const styles = StyleSheet.create({
   gridItem: {
     flex: 1,
     marginBottom: 16,
+    aspectRatio: 1,
   },
 });
 
