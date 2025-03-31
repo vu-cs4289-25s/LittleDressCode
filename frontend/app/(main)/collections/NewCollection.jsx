@@ -110,57 +110,59 @@ const NewCollection = () => {
 
   return (
     <View style={styles.container}>
-      <Header
-        title="New Collection"
-        showBackButton
-        backTo={null}
-        showSearch={false}
-      />
+        <Header
+            title="New Collection"
+            showBackButton
+            backTo="/outfits"
+            showSearch={false}
+        />
 
-      <View style={styles.body}>
         <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
+        style={styles.body}
+        contentContainerStyle={styles.bodyContent}
+        keyboardShouldPersistTaps="handled"
         >
-          {selectedOutfits.map((item) => (
+        <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+        >
+            {selectedOutfits.map((item) => (
             <View key={item.id} style={styles.itemWrapper}>
-              <ItemContainer
+                <ItemContainer
                 clothingItem={item.image}
                 isFavorited={false}
                 toggleFavorite={() => {}}
                 isSelectable={false}
                 isSelected={false}
                 showControls={false}
-              />
+                />
             </View>
-          ))}
+            ))}
         </ScrollView>
 
         <View style={styles.inputWrapper}>
-          <TextField
+            <TextField
             icon="edit"
             placeholder="Give your collection a name!"
             size="medium"
             onChangeText={setName}
-          />
+            />
         </View>
 
         <View style={styles.accordianWrapper}>
-          <AccordionView
+            <AccordionView
             title="Tag this Collection"
             sections={sections}
             selectedButtons={selectedButtons}
             onSelectButton={onSelectButton}
-          />
+            />
         </View>
 
-        <Button
-          title="Save Collection"
-          onPress={handleSave}
-        />
-      </View>
+        <Button title="Save Collection" onPress={handleSave} />
+        </ScrollView>
+
     </View>
   );
 };
@@ -192,6 +194,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   accordianWrapper: {},
+  bodyContent: {
+    gap: 12,
+    paddingBottom: 40, // enough space for bottom button to show fully
+  },
+  
 });
 
 export default NewCollection;

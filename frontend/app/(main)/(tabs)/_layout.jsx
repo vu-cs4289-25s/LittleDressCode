@@ -1,6 +1,7 @@
 import { Tabs } from "expo-router";
 import { Platform } from "react-native";
 import theme from "../../../styles/theme"; // Adjust path if needed
+import { router } from "expo-router";
 import {
   FontAwesome,
   Entypo,
@@ -38,14 +39,23 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="outfits"
-        options={{
-          title: "Outfits",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="shirt" size={24} color={color} />
-          ),
-        }}
-      />
+  name="outfits"
+  options={{
+    title: "Outfits",
+    tabBarIcon: ({ color }) => (
+      <FontAwesome6 name="shirt" size={24} color={color} />
+    ),
+  }}
+  listeners={{
+    tabPress: (e) => {
+      // Prevent default behavior
+      e.preventDefault();
+      // Navigate explicitly to /outfits with no query string
+      router.replace("/outfits");
+    },
+  }}
+/>
+
       <Tabs.Screen
         name="closet"
         options={{
