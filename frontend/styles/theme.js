@@ -46,7 +46,7 @@ const theme = {
   },
 
   borderRadius: {
-    default: 100,
+    default: 150,
     small: 10,
   },
 };

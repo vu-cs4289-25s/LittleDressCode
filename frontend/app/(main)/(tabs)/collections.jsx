@@ -22,7 +22,6 @@ const dummyImages = {
   6: require("@/assets/images/dummy/outfits/img-6.png"),
 };
 
-
 const CollectionScreen = () => {
   const [collections, setCollections] = useState([]);
 
@@ -93,7 +92,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   collectionSection: {
-    marginBottom: 24,
+    padding: 16
   },
   collectionHeader: {
     flexDirection: "row",

@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Button,
-} from "react-native";
+import { View, StyleSheet, ScrollView, Button } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { getAuth } from "firebase/auth";
 
@@ -20,7 +15,6 @@ import dummy3 from "../../../assets/images/dummy/outfits/img-3.png";
 import dummy4 from "../../../assets/images/dummy/outfits/img-4.png";
 import dummy5 from "../../../assets/images/dummy/outfits/img-5.png";
 import dummy6 from "../../../assets/images/dummy/outfits/img-6.png";
-
 
 const dummyStartData = [
   { id: 1, image: dummy1 },
@@ -110,59 +104,58 @@ const NewCollection = () => {
 
   return (
     <View style={styles.container}>
-        <Header
-            title="New Collection"
-            showBackButton
-            backTo="/outfits"
-            showSearch={false}
-        />
+      <Header
+        title="New Collection"
+        showBackButton
+        backTo="/outfits"
+        showSearch={false}
+      />
 
-        <ScrollView
+      <ScrollView
         style={styles.body}
         contentContainerStyle={styles.bodyContent}
         keyboardShouldPersistTaps="handled"
-        >
+      >
         <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.scroll}
-            contentContainerStyle={styles.scrollContent}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
         >
-            {selectedOutfits.map((item) => (
+          {selectedOutfits.map((item) => (
             <View key={item.id} style={styles.itemWrapper}>
-                <ItemContainer
+              <ItemContainer
                 clothingItem={item.image}
                 isFavorited={false}
                 toggleFavorite={() => {}}
                 isSelectable={false}
                 isSelected={false}
                 showControls={false}
-                />
+              />
             </View>
-            ))}
+          ))}
         </ScrollView>
 
         <View style={styles.inputWrapper}>
-            <TextField
+          <TextField
             icon="edit"
             placeholder="Give your collection a name!"
             size="medium"
             onChangeText={setName}
-            />
+          />
         </View>
 
         <View style={styles.accordianWrapper}>
-            <AccordionView
+          <AccordionView
             title="Tag this Collection"
             sections={sections}
             selectedButtons={selectedButtons}
             onSelectButton={onSelectButton}
-            />
+          />
         </View>
 
         <Button title="Save Collection" onPress={handleSave} />
-        </ScrollView>
-
+      </ScrollView>
     </View>
   );
 };
@@ -198,7 +191,6 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingBottom: 40, // enough space for bottom button to show fully
   },
-  
 });
 
 export default NewCollection;
