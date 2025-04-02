@@ -15,7 +15,7 @@ const Header = ({
   showSearch = true,
 }) => {
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <View style={styles.container}>
         <View style={styles.main}>
           <View style={styles.titleRow}>
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   container: {
-    padding: 12,
+    padding: 10,
     gap: 8,
   },
   main: {
@@ -61,7 +61,6 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: "600",
     paddingLeft: 4,
-    lineHeight: 33,
   },
 });
 
