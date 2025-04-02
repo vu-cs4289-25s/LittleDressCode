@@ -6,6 +6,7 @@ import {
   Text,
   FlatList,
   Image,
+  TouchableOpacity,
 } from "react-native";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/app/utils/firebaseConfig";
@@ -57,6 +58,7 @@ const CollectionScreen = () => {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {collections.map((col) => (
+          <TouchableOpacity onPress={() => router.push(`/collections/${col.id}`)}>
           <View key={col.id} style={styles.collectionSection}>
             <View style={styles.collectionHeader}>
               <Text style={styles.collectionTitle}>{col.name}</Text>
@@ -70,15 +72,15 @@ const CollectionScreen = () => {
               renderItem={({ item }) => (
                 <View style={styles.outfitItem}>
                   <Image
-                    source={dummyImages[item]} // ✅ dynamically load based on outfit ID
+                    source={dummyImages[item]}
                     style={styles.outfitImage}
                     resizeMode="contain"
                   />
                 </View>
-              
               )}
             />
           </View>
+        </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
