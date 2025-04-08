@@ -15,7 +15,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import AccordionView from "../AccordionView";
 
 const FILTER_CATEGORIES = {
-  Category: [
+  Category: [  
     "Tops",
     "Pants",
     "Skirts",
