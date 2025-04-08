@@ -42,6 +42,7 @@ const FILTER_CATEGORIES = {
   Style: ["Casual", "Formal", "Streetwear", "Sporty"],
   Season: ["Summer", "Winter", "Spring", "Fall"],
   Fit: ["Slim", "Loose", "Regular", "Tight", "Oversized"],
+  Favorite: ["Favorited"], // ✅ Added Favorited
 };
 
 const ICONS = [
@@ -62,6 +63,12 @@ const FilterBar = ({ onFilterChange }) => {
   useEffect(() => {
     setVisibleFilters(selectedFilters.slice(0, MAX_VISIBLE));
   }, [selectedFilters]);
+
+  const getCategoryForFilter = (filter) => {
+    return Object.entries(FILTER_CATEGORIES).find(([, values]) =>
+      values.includes(filter)
+    )?.[0];
+  };
 
   const toggleFilter = (category, filter) => {
     setSelectedFilters((prev) => {
@@ -106,7 +113,7 @@ const FilterBar = ({ onFilterChange }) => {
         {visibleFilters.map((filter, idx) => (
           <TouchableOpacity
             key={idx}
-            onPress={() => toggleFilter(filter)}
+            onPress={() => toggleFilter(getCategoryForFilter(filter), filter)} // ✅ Fix here
             style={[
               styles.tag,
               selectedFilters.includes(filter) && styles.tagSelected,
@@ -130,7 +137,6 @@ const FilterBar = ({ onFilterChange }) => {
         onClose={() => setModalVisible(false)}
         onApply={applyFilters}
       >
-        
         <AccordionView
           sections={sections}
           selectedButtons={selectedFilters.reduce((acc, filter) => {

@@ -5,8 +5,7 @@ import { uploadImage } from "@/app/utils/upload";
 import Header from "@/components/headers/Header";
 import FilterBar from "@/components/common/FilterBar";
 import { useRouter } from "expo-router";
-import { getFilteredClothingItems } from "@/app/utils/clothingService";
-
+import { getFilteredClothingItems, updateFavoriteStatus } from "@/app/utils/clothingService";
 
 import dummy1 from "../../../assets/images/dummy/clothing/img-1.png";
 import dummy2 from "../../../assets/images/dummy/clothing/img-2.png";
@@ -30,96 +29,104 @@ const dummyStartData = [
 
 const ClosetScreen = () => {
   const router = useRouter();
+  const userId = "testUser123"; // Replace with real user ID
 
-  const userId = "testUser123"; // Replace this with real user ID later
-
-
-  const [clothingData, setClothingData] = useState(
-    dummyStartData.map((image, index) => ({
-      id: index + 1,
-      image: image,
-    }))
-  );
+  const [clothingData, setClothingData] = useState([]);
+  const [favoritedIds, setFavoritedIds] = useState([]);
 
   const handleUploadSuccess = (url) => {
     setClothingData((prevData) => [
       ...prevData,
       {
         id: prevData.length + 1,
-        image: { uri: url }, // Uploaded images have `uri` format
+        image: { uri: url },
       },
     ]);
 
-    // Redirect to AddItem to fill in the clothing metadata
     router.push({
       pathname: "/closet/AddItem",
       params: { imageUrl: url },
     });
   };
 
+  const isFavorited = (id) => favoritedIds.includes(id);
 
-const handleFilterChange = async (filters) => {
-  console.log("🔍 handleFilterChange triggered with:", filters);
+  const toggleFavorite = async (id) => {
+    const isNowFavorite = !isFavorited(id);
+    setFavoritedIds((prev) =>
+      isNowFavorite ? [...prev, id] : prev.filter((fid) => fid !== id)
+    );
 
-  try {
-    console.log("📞 About to call getFilteredClothingItems");
-    const filtered = await getFilteredClothingItems(userId, filters);
-
-    const firebaseData = filtered.map((item, index) => ({
-      id: item.id || `firebase-${index}`,
-      name: item.name,
-      image: { uri: item.imageUrl },
-    }));
-
-    if (filters.length === 0) {
-      const combined = [
-        ...dummyStartData.map((img, i) => ({
-          id: i + 1,
-          name: `[dummy ${i + 1}]`,
-          image: img,
-        })),
-        ...firebaseData,
-      ];
-      setClothingData(combined);
-      console.log(
-        "🧺 Items on screen (no filters):",
-        combined.map((item) => item.name)
-      );
-    } else {
-      console.log("🧪 Entered filtered branch");
-      setClothingData(firebaseData);
-      console.log(
-        "🎯 Items on screen (filtered):",
-        firebaseData.map((item) => item.name)
-      );
+    try {
+      await updateFavoriteStatus(id, isNowFavorite);
+      console.log(`💖 Favorite updated: ${id} -> ${isNowFavorite}`);
+    } catch (err) {
+      console.error("❌ Failed to update favorite status:", err);
     }
-  } catch (err) {
-    console.error("❌ Error in handleFilterChange:", err);
-  }
-};
+  };
 
-useEffect(() => {
-  handleFilterChange([]); // Initial load
-}, []);
+  const handleFilterChange = async (filters) => {
+    console.log("🔍 handleFilterChange triggered with:", filters);
+    try {
+      const filtered = await getFilteredClothingItems(userId, filters);
 
-return (
-  <View style={styles.container}>
-    <Header
-      title={"My Closet"}
-      onPress={() => uploadImage(handleUploadSuccess)}
-    />
-    <FilterBar onFilterChange={handleFilterChange} />
-    <GridLayout data={clothingData} numColumns={2} />
-  </View>
-);
+      const favorited = filtered
+        .filter((item) => item.favorite === true)
+        .map((item) => item.id);
+
+      setFavoritedIds(favorited);
+
+      const firebaseData = filtered.map((item, index) => ({
+        id: item.id || `firebase-${index}`,
+        name: item.name,
+        image: { uri: item.imageUrl },
+      }));
+
+      if (filters.length === 0) {
+        const combined = [
+          ...dummyStartData.map((img, i) => ({
+            id: i + 1,
+            name: `[dummy ${i + 1}]`,
+            image: img,
+          })),
+          ...firebaseData,
+        ];
+        setClothingData(combined);
+      } else {
+        setClothingData(firebaseData);
+      }
+    } catch (err) {
+      console.error("❌ Error in handleFilterChange:", err);
+    }
+  };
+
+  useEffect(() => {
+    handleFilterChange([]);
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <Header
+        title="My Closet"
+        onPress={() => uploadImage(handleUploadSuccess)}
+      />
+      <FilterBar onFilterChange={handleFilterChange} />
+      <GridLayout
+        data={clothingData}
+        numColumns={2}
+        isFavorited={isFavorited}
+        toggleFavorite={toggleFavorite}
+      />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-container: {
-  flex: 1,
-  backgroundColor: "white",
-  padding: 16,
-},
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+    padding: 16,
+  },
 });
 
 export default ClosetScreen;
