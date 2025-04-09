@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity, Button } from "react-native";
 import GridLayout from "@/components/organization/GridLayout";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/utils/firebaseConfig";
@@ -12,7 +7,9 @@ import Header from "@/components/headers/Header";
 import FilterBar from "@/components/common/FilterBar";
 import theme from "@/styles/theme";
 import { OUTFIT_FILTERS } from "@/constants/filterPresets";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { router, useRouter, useLocalSearchParams } from "expo-router";
+
+
 
 const OutfitScreen = () => {
   const router = useRouter();
@@ -22,6 +19,7 @@ const OutfitScreen = () => {
   const [outfits, setOutfits] = useState([]);
   const [filteredOutfits, setFilteredOutfits] = useState([]);
   const [favoritedIds, setFavoritedIds] = useState([]);
+
   const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
@@ -49,6 +47,7 @@ const OutfitScreen = () => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
+
   };
 
   const handleSearch = () => {
@@ -58,6 +57,7 @@ const OutfitScreen = () => {
   const handleNewOutfit = () => {
     router.push("/outfits/NewOutfit");
   };
+
 
   const handleNext = () => {
     router.push({
@@ -114,7 +114,6 @@ const OutfitScreen = () => {
         onPress={isSelectionMode ? null : handleNewOutfit}
         handleTextChange={handleSearch}
       />
-
       <FilterBar filters={OUTFIT_FILTERS} onFilterChange={handleFilterChange} />
 
       <GridLayout

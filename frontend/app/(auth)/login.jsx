@@ -73,6 +73,7 @@ export default function LoginPage() {
             color="light"
             onPress={handleGoogleSignIn}
             disabled={!request}
+            img={require("../../assets/icons/google.webp")} 
           />
           <View style={styles.orSeparator}>
             <View style={styles.separatorLine} />

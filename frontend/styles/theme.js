@@ -28,6 +28,7 @@ const theme = {
     accent: {
       lightPink: "#F7B0BE",
       brown: "#734230",
+      grey: "#CCCCCC"
     },
     neutral: {
       black: "#181C25",
