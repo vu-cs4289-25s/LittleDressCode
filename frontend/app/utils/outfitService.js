@@ -26,10 +26,23 @@ export const addOutfit = async (
       fit: Array.isArray(fit) ? fit : [fit],
       imageUrl,
       isPublic,
+      favorite: false,
       createdAt: new Date(),
     });
     return docRef.id;
   } catch (error) {
     console.error("Error adding outfit:", error);
+  }
+};
+
+export const updateOutfitFavoriteStatus = async (outfitId, isFavorite) => {
+  try {
+    const outfitRef = doc(db, "outfits", outfitId);
+    await updateDoc(outfitRef, {
+      favorite: isFavorite,
+    });
+    console.log(`💖 Outfit ${outfitId} favorite updated to: ${isFavorite}`);
+  } catch (error) {
+    console.error("Error updating outfit favorite:", error);
   }
 };

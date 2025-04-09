@@ -8,60 +8,26 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
+import { collection, getDocs, query } from "firebase/firestore";
+import { db } from "@/app/utils/firebaseConfig";
 import StyleHeader from "@/components/headers/StyleHeader";
 import TextButton from "@/components/common/TextButton";
 import ItemContainer from "@/components/organization/ItemContainer";
-import { GestureHandlerRootView } from "react-native-gesture-handler"; // Import GestureHandlerRootView
-
-import Draggable from "react-draggable"; // Import react-draggable
-
-
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Draggable from "react-draggable";
 import theme from "@/styles/theme";
 
-// Dummy images
-import dummy1 from "../../../assets/images/dummy/clothing/img-1.png";
-import dummy2 from "../../../assets/images/dummy/clothing/img-2.png";
-import dummy3 from "../../../assets/images/dummy/clothing/img-3.png";
-import dummy4 from "../../../assets/images/dummy/clothing/img-4.png";
-import dummy5 from "../../../assets/images/dummy/clothing/img-5.png";
-import dummy6 from "../../../assets/images/dummy/clothing/img-6.png";
-import dummy7 from "../../../assets/images/dummy/clothing/img-7.png";
-import dummy8 from "../../../assets/images/dummy/clothing/img-8.png";
-import dummy9 from "../../../assets/images/dummy/clothing/img-10.png";
-import dummy10 from "../../../assets/images/dummy/clothing/img.png";
-import dummy11 from "../../../assets/images/dummy/clothing/img-12.png";
-import dummy12 from "../../../assets/images/dummy/clothing/img-13.png";
-import dummy13 from "../../../assets/images/dummy/clothing/img-14.png";
-
-const dummyStartData = [
-  dummy1,
-  dummy2,
-  dummy3,
-  dummy4,
-  dummy5,
-  dummy6,
-  dummy7,
-  dummy8,
-];
-
-const tops = [dummy1, dummy3, dummy4, dummy5, dummy6];
-const bottoms = [dummy2, dummy9, dummy10];
-const shoes = [dummy11, dummy12, dummy13];
+// Categories & Tabs
 const categories = ["All", "Tops", "Pants", "Shoes", "Jackets"];
 const tabs = ["Mix & Match", "Canvas", "Use AI"];
 
-// ONLY WOKRING FOR WEB!!
 const DraggableItem = ({ image, id, position, onSavePosition }) => {
   const handleStop = (e, data) => {
-    // Save the position when dragging stops
     onSavePosition(id, data.x, data.y);
   };
 
   return (
-    <Draggable
-      position={{ x: position.x, y: position.y }} // Initial position
-      onStop={handleStop} // Handler when drag stops
-    >
+    <Draggable position={position} onStop={handleStop}>
       <View style={styles.draggable}>
         <Image source={image} style={styles.itemImage} />
       </View>
@@ -69,14 +35,71 @@ const DraggableItem = ({ image, id, position, onSavePosition }) => {
   );
 };
 
-// MAIN
+const OutfitRow = ({ title, data }) => (
+  <View style={styles.rowContainer}>
+    <Text style={styles.title}>{title}</Text>
+    <FlatList
+      data={data}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      keyExtractor={(item, index) => item.id || index.toString()}
+      renderItem={({ item }) => (
+        <Image
+          source={{ uri: item.imageUrl }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      )}
+    />
+  </View>
+);
+
 const NewOutfit = () => {
   const [selectedTab, setSelectedTab] = useState("Canvas");
-  const [selectedItems, setSelectedItems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedItems, setSelectedItems] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [clothingData, setClothingData] = useState([]);
+  const [tops, setTops] = useState([]);
+  const [bottoms, setBottoms] = useState([]);
+  const [shoes, setShoes] = useState([]);
 
-  // Adding and removing item to the canvas
+  useEffect(() => {
+    const fetchClothingItems = async () => {
+      try {
+        const q = query(collection(db, "clothingItems"));
+        const snapshot = await getDocs(q);
+        const items = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+        setClothingData(items);
+        setTops(items.filter((item) => item.category?.includes("Tops")));
+        setBottoms(
+          items.filter(
+            (item) =>
+              item.category?.includes("Pants") ||
+              item.category?.includes("Skirts")
+          )
+        );
+        setShoes(items.filter((item) => item.category?.includes("Shoes")));
+      } catch (err) {
+        console.error("❌ Error fetching clothing items:", err);
+      }
+    };
+
+    fetchClothingItems();
+  }, []);
+
+  const addToCanvas = (item) => {
+    setSelectedItems([
+      ...selectedItems,
+      {
+        ...item,
+        position: { x: 0, y: 0 },
+        rotation: 0,
+      },
+    ]);
+  };
+
   const toggleSelect = (item) => {
     setSelectedIds((prev) =>
       prev.includes(item.id)
@@ -91,25 +114,6 @@ const NewOutfit = () => {
     } else {
       addToCanvas(item);
     }
-  };
-
-  const [clothingData, setClothingData] = useState(
-    dummyStartData.map((image, index) => ({
-      id: index + 1,
-      image: image,
-      category: index % 2 === 0 ? "Tops" : "Pants",
-    }))
-  );
-
-  const addToCanvas = (item) => {
-    setSelectedItems([
-      ...selectedItems,
-      { 
-        ...item, 
-        position: { x: 0, y: 0 },  
-        rotation: 0, 
-      },
-    ]);
   };
 
   const savePosition = (id, x, y, rotation) => {
@@ -153,13 +157,13 @@ const NewOutfit = () => {
           <>
             <View style={styles.canvas}>
               {selectedItems.map((item, index) => (
-                 <DraggableItem
-                 key={index}
-                 id={item.id}
-                 image={item.image}
-                 position={item.position}
-                 onSavePosition={savePosition}
-               />
+                <DraggableItem
+                  key={index}
+                  id={item.id}
+                  image={{ uri: item.imageUrl }}
+                  position={item.position}
+                  onSavePosition={savePosition}
+                />
               ))}
             </View>
 
@@ -199,7 +203,7 @@ const NewOutfit = () => {
                     onPress={() => addToCanvas(item)}
                   >
                     <ItemContainer
-                      clothingItem={item.imageUrl || item.image}
+                      clothingItem={{ uri: item.imageUrl }}
                       selectedIds={selectedIds}
                       isSelectable={true}
                       isSelected={selectedIds.includes(item.id)}
@@ -231,30 +235,12 @@ const NewOutfit = () => {
         )}
 
         <View style={styles.containerButton}>
-          <TextButton
-            title="Next"
-            size="large"
-            color="dark"
-            onPress={() => {}}
-          />
+          <TextButton title="Next" size="large" color="dark" onPress={() => {}} />
         </View>
       </View>
     </GestureHandlerRootView>
   );
 };
-
-const OutfitRow = ({ title, data }) => (
-  <View style={styles.rowContainer}>
-    <Text style={styles.title}>{title}</Text>
-    <FlatList
-      data={data}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      keyExtractor={(item, index) => index.toString()}
-      renderItem={({ item }) => <Image source={item} style={styles.image} />}
-    />
-  </View>
-);
 
 const styles = StyleSheet.create({
   container: {
