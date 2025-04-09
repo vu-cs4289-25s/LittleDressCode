@@ -20,21 +20,19 @@ const OutfitScreen = () => {
   const router = useRouter(); // Get the router object from expo-router
   const isSelectionMode = mode === "select";
 
-
-
   const handleFilterChange = async (filters) => {
     console.log("🔍 handleFilterChange triggered with:", filters);
-  
+
     try {
       console.log("📞 About to call getFilteredClothingItems");
       const filtered = await getFilteredClothingItems(userId, filters);
-  
+
       const firebaseData = filtered.map((item, index) => ({
         id: item.id || `firebase-${index}`,
         name: item.name,
         image: { uri: item.imageUrl },
       }));
-  
+
       if (filters.length === 0) {
         const combined = [
           ...dummyStartData.map((img, i) => ({
@@ -61,7 +59,7 @@ const OutfitScreen = () => {
       console.error("❌ Error in handleFilterChange:", err);
     }
   };
-  
+
   const [clothingData, setClothingData] = useState(
     dummyStartData.map((image, index) => ({
       id: index + 1,
@@ -75,6 +73,9 @@ const OutfitScreen = () => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
+
+
+
   };
 
   const handleSearch = () => {
@@ -82,7 +83,7 @@ const OutfitScreen = () => {
   };
 
   const handleNewOutfit = () => {
-    router.push('outfits/NewOutfit'); // Correct placement of router.push inside the function
+    router.push("outfits/NewOutfit"); // Correct placement of router.push inside the function
   };
 
   const handleNext = () => {
@@ -101,7 +102,7 @@ const OutfitScreen = () => {
         onPress={isSelectionMode ? null : handleNewOutfit}
         handleTextChange={handleSearch}
       />
-    <FilterBar onFilterChange={handleFilterChange} />
+      <FilterBar onFilterChange={handleFilterChange} />
 
       <GridLayout
         data={clothingData}
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   nextButton: {
-    backgroundColor: theme.colors.buttonBackground.dark, 
+    backgroundColor: theme.colors.buttonBackground.dark,
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 10,
@@ -147,7 +148,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  
 });
 
 export default OutfitScreen;

@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Image, StyleSheet, ActivityIndicator, Pressable } from "react-native";
+import {
+  View,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+  Pressable,
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import theme from "../../styles/theme";
 
@@ -10,7 +16,8 @@ const ItemContainer = ({
   isSelectable = false,
   isSelected = false,
   onSelect = () => {},
-  showControls = true, // ✅ NEW PROP
+  showControls = true,
+  isSolo, // if rendering ItemContainer by itself, not in GridLayout
 }) => {
   const [imageSource, setImageSource] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,15 +31,21 @@ const ItemContainer = ({
 
   return (
     <Pressable onPress={isSelectable ? onSelect : null}>
-      <View style={styles.box}>
+      <View style={[isSolo ? styles.boxSolo : styles.box]}>
         {/* Top-right icon */}
         {showControls && (
           <View style={styles.iconContainer}>
             {isSelectable ? (
               <MaterialIcons
-                name={isSelected ? "radio-button-checked" : "radio-button-unchecked"}
+                name={
+                  isSelected ? "radio-button-checked" : "radio-button-unchecked"
+                }
                 size={24}
-                color={isSelected ? theme.colors.accent : theme.colors.accent.lightPink}
+                color={
+                  isSelected
+                    ? theme.colors.accent
+                    : theme.colors.accent.lightPink
+                }
               />
             ) : (
               <Pressable onPress={toggleFavorite}>
@@ -67,9 +80,18 @@ const ItemContainer = ({
 
 const styles = StyleSheet.create({
   box: {
-    display: "flex",
-    width: 173,
-    height: 173,
+    flex: 1,
+    aspectRatio: 1,
+    paddingHorizontal: 17,
+    paddingVertical: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: theme.colors.backgrounds.secondary,
+    borderRadius: 10,
+  },
+  boxSolo: {
+    width: 180,
+    height:180,
     paddingHorizontal: 17,
     paddingVertical: 16,
     justifyContent: "center",

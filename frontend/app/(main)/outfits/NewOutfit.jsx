@@ -11,15 +11,10 @@ import {
 import StyleHeader from "@/components/headers/StyleHeader";
 import TextButton from "@/components/common/TextButton";
 import ItemContainer from "@/components/organization/ItemContainer";
+import { GestureHandlerRootView } from "react-native-gesture-handler"; // Import GestureHandlerRootView
 
-import {
-  PanGestureHandler,
-} from "react-native-gesture-handler";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from "react-native-reanimated";
+import Draggable from "react-draggable"; // Import react-draggable
+
 
 import theme from "@/styles/theme";
 
@@ -55,46 +50,48 @@ const shoes = [dummy11, dummy12, dummy13];
 const categories = ["All", "Tops", "Pants", "Shoes", "Jackets"];
 const tabs = ["Mix & Match", "Canvas", "Use AI"];
 
-// DRAGGABLE COMPONENT
-const DraggableItem = ({ image }) => {
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-
-  const onGestureEvent = (event) => {
-    translateX.value = event.translationX;
-    translateY.value = event.translationY;
+// ONLY WOKRING FOR WEB!!
+const DraggableItem = ({ image, id, position, onSavePosition }) => {
+  const handleStop = (e, data) => {
+    // Save the position when dragging stops
+    onSavePosition(id, data.x, data.y);
   };
-
-  const onHandlerStateChange = (event) => {
-    if (event.nativeEvent.state === 5) { // END state
-      translateX.value = withSpring(translateX.value);
-      translateY.value = withSpring(translateY.value);
-    }
-  };
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-    ],
-  }));
 
   return (
-    <PanGestureHandler
-      onGestureEvent={onGestureEvent}
-      onHandlerStateChange={onHandlerStateChange}
+    <Draggable
+      position={{ x: position.x, y: position.y }} // Initial position
+      onStop={handleStop} // Handler when drag stops
     >
-      <Animated.View style={[styles.draggable, animatedStyle]}>
+      <View style={styles.draggable}>
         <Image source={image} style={styles.itemImage} />
-      </Animated.View>
-    </PanGestureHandler>
+      </View>
+    </Draggable>
   );
 };
 
+// MAIN
 const NewOutfit = () => {
   const [selectedTab, setSelectedTab] = useState("Canvas");
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  // Adding and removing item to the canvas
+  const toggleSelect = (item) => {
+    setSelectedIds((prev) =>
+      prev.includes(item.id)
+        ? prev.filter((x) => x !== item.id)
+        : [...prev, item.id]
+    );
+
+    if (selectedIds.includes(item.id)) {
+      setSelectedItems((prevItems) =>
+        prevItems.filter((i) => i.id !== item.id)
+      );
+    } else {
+      addToCanvas(item);
+    }
+  };
 
   const [clothingData, setClothingData] = useState(
     dummyStartData.map((image, index) => ({
@@ -105,112 +102,144 @@ const NewOutfit = () => {
   );
 
   const addToCanvas = (item) => {
-    if (!selectedItems.some((i) => i.id === item.id)) {
-      setSelectedItems([...selectedItems, item]);
-    }
+    setSelectedItems([
+      ...selectedItems,
+      { 
+        ...item, 
+        position: { x: 0, y: 0 },  
+        rotation: 0, 
+      },
+    ]);
+  };
+
+  const savePosition = (id, x, y, rotation) => {
+    setSelectedItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, position: { x, y }, rotation } : item
+      )
+    );
   };
 
   return (
-    <View style={styles.bigContainer}>
-      <View style={styles.container}>
-        <StyleHeader />
-      </View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={styles.bigContainer}>
+        <View style={styles.container}>
+          <StyleHeader />
+        </View>
 
-      <View style={styles.tabHeader}>
-        {tabs.map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            onPress={() => setSelectedTab(tab)}
-            style={[
-              styles.tabButton,
-              selectedTab === tab && styles.tabButtonActive,
-            ]}
-          >
-            <Text
+        <View style={styles.tabHeader}>
+          {tabs.map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              onPress={() => setSelectedTab(tab)}
               style={[
-                styles.tabText,
-                selectedTab === tab && styles.tabTextActive,
+                styles.tabButton,
+                selectedTab === tab && styles.tabButtonActive,
               ]}
             >
-              {tab}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+              <Text
+                style={[
+                  styles.tabText,
+                  selectedTab === tab && styles.tabTextActive,
+                ]}
+              >
+                {tab}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      {selectedTab === "Canvas" && (
-        <>
-          <View style={styles.canvas}>
-            {selectedItems.map((item, index) => (
-              <DraggableItem key={index} image={item.image} />
-            ))}
-          </View>
-
-          <View style={styles.container}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.categoryBar}
-            >
-              {categories.map((cat) => (
-                <TouchableOpacity
-                  key={cat}
-                  onPress={() => setSelectedCategory(cat)}
-                  style={{ marginRight: 12 }}
-                >
-                  <TextButton
-                    title={cat}
-                    size="small"
-                    color="light"
-                    onPress={() => setSelectedCategory(cat)}
-                  />
-                </TouchableOpacity>
+        {selectedTab === "Canvas" && (
+          <>
+            <View style={styles.canvas}>
+              {selectedItems.map((item, index) => (
+                 <DraggableItem
+                 key={index}
+                 id={item.id}
+                 image={item.image}
+                 position={item.position}
+                 onSavePosition={savePosition}
+               />
               ))}
+            </View>
+
+            <View style={styles.container}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.categoryBar}
+              >
+                {categories.map((cat) => (
+                  <TouchableOpacity
+                    key={cat}
+                    onPress={() => setSelectedCategory(cat)}
+                    style={{ marginRight: 12 }}
+                  >
+                    <TextButton
+                      title={cat}
+                      size="small"
+                      color="light"
+                      onPress={() => setSelectedCategory(cat)}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              <FlatList
+                data={clothingData.filter(
+                  (item) =>
+                    selectedCategory === "All" ||
+                    item.category === selectedCategory
+                )}
+                horizontal
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={{ marginRight: 12 }}
+                    onPress={() => addToCanvas(item)}
+                  >
+                    <ItemContainer
+                      clothingItem={item.imageUrl || item.image}
+                      selectedIds={selectedIds}
+                      isSelectable={true}
+                      isSelected={selectedIds.includes(item.id)}
+                      onSelect={() => toggleSelect(item)}
+                      isSolo={true}
+                    />
+                  </TouchableOpacity>
+                )}
+                showsHorizontalScrollIndicator={false}
+              />
+            </View>
+          </>
+        )}
+
+        {selectedTab === "Mix & Match" && (
+          <View style={styles.container}>
+            <ScrollView>
+              <OutfitRow title="Tops" data={tops} />
+              <OutfitRow title="Bottoms" data={bottoms} />
+              <OutfitRow title="Shoes" data={shoes} />
             </ScrollView>
-
-            <FlatList
-              data={clothingData.filter(
-                (item) =>
-                  selectedCategory === "All" ||
-                  item.category === selectedCategory
-              )}
-              horizontal
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={{ marginRight: 12 }}
-                  onPress={() => addToCanvas(item)}
-                >
-                  <ItemContainer clothingItem={item.image} isSelectable={true} />
-                </TouchableOpacity>
-              )}
-              showsHorizontalScrollIndicator={false}
-            />
           </View>
-        </>
-      )}
+        )}
 
-      {selectedTab === "Mix & Match" && (
-        <View style={styles.container}>
-          <ScrollView>
-            <OutfitRow title="Tops" data={tops} />
-            <OutfitRow title="Bottoms" data={bottoms} />
-            <OutfitRow title="Shoes" data={shoes} />
-          </ScrollView>
-          <TextButton title="Next" size="large" color="dark" onPress={() => {}} />
+        {selectedTab === "Use AI" && (
+          <View style={styles.container}>
+            <Text>ai</Text>
+          </View>
+        )}
+
+        <View style={styles.containerButton}>
+          <TextButton
+            title="Next"
+            size="large"
+            color="dark"
+            onPress={() => {}}
+          />
         </View>
-      )}
-
-      {selectedTab === "Use AI" && (
-        <View style={styles.container}>
-          <Text>ai</Text>
-        </View>
-      )}
-
-      <View style={styles.containerButton}>
-        <TextButton title="Next" size="large" color="dark" onPress={() => {}} />
       </View>
-    </View>
+    </GestureHandlerRootView>
   );
 };
 
@@ -235,17 +264,23 @@ const styles = StyleSheet.create({
   },
   containerButton: {
     padding: 16,
+    position: "absolute",
+    bottom: 16,
+    left: 0,
+    right: 0,
   },
   bigContainer: {
     flex: 1,
     backgroundColor: "white",
-    paddingBottom: 50,
+    paddingBottom: 80,
+    position: "relative",
   },
   canvas: {
-    height: 400,
-    width: "100%",
+    flex: 1,
     backgroundColor: theme.colors.backgrounds.secondary,
     position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
   },
   categoryBar: {
     marginBottom: 16,
@@ -288,14 +323,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   itemImage: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 200,
     resizeMode: "contain",
+    alignContent: "center",
   },
   draggable: {
     position: "absolute",
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 200,
   },
 });
 
