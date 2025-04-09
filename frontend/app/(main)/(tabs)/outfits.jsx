@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { View, StyleSheet, Button, TouchableOpacity, Text } from "react-native";
 import GridLayout from "../../../components/organization/GridLayout";
 import { router, useRouter, useLocalSearchParams } from "expo-router";
-import { MaterialIcons } from "@expo/vector-icons";
 import theme from "@/styles/theme";
-
+import FilterBar from "@/components/common/FilterBar";
 // Dummy outfit images
 import Header from "@/components/headers/Header";
 import dummy1 from "../../../assets/images/dummy/outfits/img-1.png";
@@ -21,6 +20,48 @@ const OutfitScreen = () => {
   const router = useRouter(); // Get the router object from expo-router
   const isSelectionMode = mode === "select";
 
+
+
+  const handleFilterChange = async (filters) => {
+    console.log("🔍 handleFilterChange triggered with:", filters);
+  
+    try {
+      console.log("📞 About to call getFilteredClothingItems");
+      const filtered = await getFilteredClothingItems(userId, filters);
+  
+      const firebaseData = filtered.map((item, index) => ({
+        id: item.id || `firebase-${index}`,
+        name: item.name,
+        image: { uri: item.imageUrl },
+      }));
+  
+      if (filters.length === 0) {
+        const combined = [
+          ...dummyStartData.map((img, i) => ({
+            id: i + 1,
+            name: `[dummy ${i + 1}]`,
+            image: img,
+          })),
+          ...firebaseData,
+        ];
+        setClothingData(combined);
+        console.log(
+          "🧺 Items on screen (no filters):",
+          combined.map((item) => item.name)
+        );
+      } else {
+        console.log("🧪 Entered filtered branch");
+        setClothingData(firebaseData);
+        console.log(
+          "🎯 Items on screen (filtered):",
+          firebaseData.map((item) => item.name)
+        );
+      }
+    } catch (err) {
+      console.error("❌ Error in handleFilterChange:", err);
+    }
+  };
+  
   const [clothingData, setClothingData] = useState(
     dummyStartData.map((image, index) => ({
       id: index + 1,
@@ -60,6 +101,7 @@ const OutfitScreen = () => {
         onPress={isSelectionMode ? null : handleNewOutfit}
         handleTextChange={handleSearch}
       />
+    <FilterBar onFilterChange={handleFilterChange} />
 
       <GridLayout
         data={clothingData}
