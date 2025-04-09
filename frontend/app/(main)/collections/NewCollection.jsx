@@ -1,40 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ScrollView, Button } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { getAuth } from "firebase/auth";
+import { collection, getDocs } from "firebase/firestore";
 
 import Header from "@/components/headers/Header";
 import ItemContainer from "@/components/organization/ItemContainer";
 import TextField from "@/components/common/Textfield";
 import AccordionView from "@/components/AccordionView";
-import { addCollection } from "../../utils/collectionsService";
-
-import dummy1 from "../../../assets/images/dummy/outfits/img-1.png";
-import dummy2 from "../../../assets/images/dummy/outfits/img-2.png";
-import dummy3 from "../../../assets/images/dummy/outfits/img-3.png";
-import dummy4 from "../../../assets/images/dummy/outfits/img-4.png";
-import dummy5 from "../../../assets/images/dummy/outfits/img-5.png";
-import dummy6 from "../../../assets/images/dummy/outfits/img-6.png";
-
-const dummyStartData = [
-  { id: 1, image: dummy1 },
-  { id: 2, image: dummy2 },
-  { id: 3, image: dummy3 },
-  { id: 4, image: dummy4 },
-  { id: 5, image: dummy5 },
-  { id: 6, image: dummy6 },
-];
+import { db } from "@/app/utils/firebaseConfig";
+import { addCollection } from "@/app/utils/collectionsService";
 
 const NewCollection = () => {
   const { selected } = useLocalSearchParams();
   const selectedIds = JSON.parse(selected || "[]");
 
-  const selectedOutfits = dummyStartData.filter((item) =>
-    selectedIds.includes(item.id)
-  );
-
+  const [outfits, setOutfits] = useState([]);
   const [name, setName] = useState("");
   const [selectedButtons, setSelectedButtons] = useState({});
+
+  useEffect(() => {
+    const fetchOutfits = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "outfits"));
+        const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const selectedOutfits = data.filter((item) => selectedIds.includes(item.id));
+        setOutfits(selectedOutfits);
+      } catch (error) {
+        console.error("Error fetching outfits:", error);
+      }
+    };
+
+    fetchOutfits();
+  }, [selectedIds]);
 
   const sections = [
     {
@@ -80,7 +78,7 @@ const NewCollection = () => {
       return;
     }
 
-    const outfitIds = selectedOutfits.map((item) => item.id);
+    const outfitIds = outfits.map((item) => item.id);
     const tags = [
       ...(selectedButtons["season"] || []),
       ...(selectedButtons["occasion"] || []),
@@ -122,10 +120,10 @@ const NewCollection = () => {
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
         >
-          {selectedOutfits.map((item) => (
+          {outfits.map((item) => (
             <View key={item.id} style={styles.itemWrapper}>
               <ItemContainer
-                clothingItem={item.image}
+                clothingItem={{ uri: item.imageUrl }}
                 isFavorited={false}
                 toggleFavorite={() => {}}
                 isSelectable={false}
@@ -189,7 +187,7 @@ const styles = StyleSheet.create({
   accordianWrapper: {},
   bodyContent: {
     gap: 12,
-    paddingBottom: 40, // enough space for bottom button to show fully
+    paddingBottom: 40,
   },
 });
 

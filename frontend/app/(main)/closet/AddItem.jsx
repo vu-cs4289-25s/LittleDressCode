@@ -38,7 +38,8 @@ const AddItem = () => {
         buttons: [
           { label: "Red" }, { label: "Blue" }, { label: "Black" },
           { label: "White" }, { label: "Green" }, { label: "Yellow" },
-          { label: "Pink" }, { label: "Gray" },
+          { label: "Pink" }, { label: "Gray" }, { label: "Brown" },
+          { label: "Purple" }, { label: "Orange" }, { label: "Multicolor" },
         ],
       },
       {
@@ -54,7 +55,7 @@ const AddItem = () => {
         title: "Season",
         buttons: [
           { label: "Spring" }, { label: "Summer" },
-          { label: "Fall" }, { label: "Winter" },
+          { label: "Fall" }, { label: "Winter" }, { label: "Any" },
         ],
       },
       {

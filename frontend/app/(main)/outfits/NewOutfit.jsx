@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,37 +7,47 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
+import { collection, getDocs, where, query } from "firebase/firestore";
+import { db } from "@/app/utils/firebaseConfig";
 import StyleHeader from "@/components/headers/StyleHeader";
-import dummy1 from "../../../assets/images/dummy/clothing/img-1.png";
-import dummy2 from "../../../assets/images/dummy/clothing/img-2.png";
-import dummy3 from "../../../assets/images/dummy/clothing/img-3.png";
-import dummy4 from "../../../assets/images/dummy/clothing/img-4.png";
-import dummy5 from "../../../assets/images/dummy/clothing/img-5.png";
-import dummy6 from "../../../assets/images/dummy/clothing/img-6.png";
-import dummy7 from "../../../assets/images/dummy/clothing/img-7.png";
-import dummy8 from "../../../assets/images/dummy/clothing/img-8.png";
-import dummy9 from "../../../assets/images/dummy/clothing/img-10.png";
-import dummy10 from "../../../assets/images/dummy/clothing/img.png";
-import dummy11 from "../../../assets/images/dummy/clothing/img-12.png";
-import dummy12 from "../../../assets/images/dummy/clothing/img-13.png";
-import dummy13 from "../../../assets/images/dummy/clothing/img-14.png";
 import TextButton from "@/components/common/TextButton";
 
-// TEMPORARY
-const tops = [dummy1, dummy3, dummy4, dummy5, dummy6];
-const bottoms = [dummy2, dummy9, dummy10];
-const shoes = [dummy11, dummy12, dummy13];
-
 const NewOutfit = () => {
+  const [tops, setTops] = useState([]);
+  const [bottoms, setBottoms] = useState([]);
+  const [shoes, setShoes] = useState([]);
+
+  useEffect(() => {
+    const fetchClothingItems = async () => {
+      try {
+        const q = query(collection(db, "clothingItems"));
+        const snapshot = await getDocs(q);
+        const items = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+        const topItems = items.filter((item) => item.category?.includes("Tops"));
+        const bottomItems = items.filter((item) => item.category?.includes("Pants") || item.category?.includes("Skirts"));
+        const shoeItems = items.filter((item) => item.category?.includes("Shoes"));
+
+        setTops(topItems);
+        setBottoms(bottomItems);
+        setShoes(shoeItems);
+      } catch (err) {
+        console.error("❌ Error fetching clothing items:", err);
+      }
+    };
+
+    fetchClothingItems();
+  }, []);
+
   return (
     <View style={styles.container}>
       <StyleHeader />
       <ScrollView>
-        <OutfitRow data={tops} />
-        <OutfitRow data={bottoms} />
-        <OutfitRow data={shoes} />
+        <OutfitRow title="Tops" data={tops} />
+        <OutfitRow title="Bottoms" data={bottoms} />
+        <OutfitRow title="Shoes" data={shoes} />
       </ScrollView>
-      <TextButton title="Next" size="large" color="dark" onPress={{}} />
+      <TextButton title="Next" size="large" color="dark" onPress={() => {}} />
     </View>
   );
 };
@@ -49,20 +60,35 @@ const OutfitRow = ({ title, data }) => {
         data={data}
         horizontal
         showsHorizontalScrollIndicator={false}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => <Image source={item} style={styles.image} />}
+        keyExtractor={(item, index) => item.id || index.toString()}
+        renderItem={({ item }) => (
+          <Image source={{ uri: item.imageUrl }} style={styles.image} />
+        )}
       />
     </View>
   );
 };
 
-// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
     padding: 16,
-    paddingBottom: 50
+    paddingBottom: 50,
+  },
+  rowContainer: {
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 10,
+    marginRight: 10,
   },
 });
 

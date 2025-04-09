@@ -5,27 +5,11 @@ import { uploadImage } from "@/app/utils/upload";
 import Header from "@/components/headers/Header";
 import FilterBar from "@/components/common/FilterBar";
 import { useRouter } from "expo-router";
-import { getFilteredClothingItems, updateFavoriteStatus } from "@/app/utils/clothingService";
-
-import dummy1 from "../../../assets/images/dummy/clothing/img-1.png";
-import dummy2 from "../../../assets/images/dummy/clothing/img-2.png";
-import dummy3 from "../../../assets/images/dummy/clothing/img-3.png";
-import dummy4 from "../../../assets/images/dummy/clothing/img-4.png";
-import dummy5 from "../../../assets/images/dummy/clothing/img-5.png";
-import dummy6 from "../../../assets/images/dummy/clothing/img-6.png";
-import dummy7 from "../../../assets/images/dummy/clothing/img-7.png";
-import dummy8 from "../../../assets/images/dummy/clothing/img-8.png";
-
-const dummyStartData = [
-  dummy1,
-  dummy2,
-  dummy3,
-  dummy4,
-  dummy5,
-  dummy6,
-  dummy7,
-  dummy8,
-];
+import { CLOTHING_FILTERS } from "@/constants/filterPresets";
+import {
+  getFilteredClothingItems,
+  updateFavoriteStatus,
+} from "@/app/utils/clothingService";
 
 const ClosetScreen = () => {
   const router = useRouter();
@@ -35,14 +19,6 @@ const ClosetScreen = () => {
   const [favoritedIds, setFavoritedIds] = useState([]);
 
   const handleUploadSuccess = (url) => {
-    setClothingData((prevData) => [
-      ...prevData,
-      {
-        id: prevData.length + 1,
-        image: { uri: url },
-      },
-    ]);
-
     router.push({
       pathname: "/closet/AddItem",
       params: { imageUrl: url },
@@ -52,6 +28,10 @@ const ClosetScreen = () => {
   const isFavorited = (id) => favoritedIds.includes(id);
 
   const toggleFavorite = async (id) => {
+    if (!id || typeof id !== "string") {
+      console.error("🚨 Invalid ID passed to toggleFavorite:", id);
+      return;
+    }
     const isNowFavorite = !isFavorited(id);
     setFavoritedIds((prev) =>
       isNowFavorite ? [...prev, id] : prev.filter((fid) => fid !== id)
@@ -66,12 +46,12 @@ const ClosetScreen = () => {
   };
 
   const handleFilterChange = async (filters) => {
-    console.log("🔍 handleFilterChange triggered with:", filters);
+    console.log("🔍 Filters applied:", filters);
     try {
       const filtered = await getFilteredClothingItems(userId, filters);
 
       const favorited = filtered
-        .filter((item) => item.favorite === true)
+        .filter((item) => item.favorite)
         .map((item) => item.id);
 
       setFavoritedIds(favorited);
@@ -82,21 +62,9 @@ const ClosetScreen = () => {
         image: { uri: item.imageUrl },
       }));
 
-      if (filters.length === 0) {
-        const combined = [
-          ...dummyStartData.map((img, i) => ({
-            id: i + 1,
-            name: `[dummy ${i + 1}]`,
-            image: img,
-          })),
-          ...firebaseData,
-        ];
-        setClothingData(combined);
-      } else {
-        setClothingData(firebaseData);
-      }
+      setClothingData(firebaseData);
     } catch (err) {
-      console.error("❌ Error in handleFilterChange:", err);
+      console.error("❌ Error filtering clothing items:", err);
     }
   };
 
@@ -110,7 +78,7 @@ const ClosetScreen = () => {
         title="My Closet"
         onPress={() => uploadImage(handleUploadSuccess)}
       />
-      <FilterBar onFilterChange={handleFilterChange} />
+      <FilterBar filters={CLOTHING_FILTERS} onFilterChange={handleFilterChange} />
       <GridLayout
         data={clothingData}
         numColumns={2}

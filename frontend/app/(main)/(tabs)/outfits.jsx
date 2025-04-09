@@ -1,34 +1,49 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Button, TouchableOpacity, Text } from "react-native";
-import GridLayout from "../../../components/organization/GridLayout";
-import { router, useRouter, useLocalSearchParams } from "expo-router";
-import { MaterialIcons } from "@expo/vector-icons";
-import theme from "@/styles/theme";
-
-// Dummy outfit images
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
+import GridLayout from "@/components/organization/GridLayout";
+import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { db } from "@/app/utils/firebaseConfig";
 import Header from "@/components/headers/Header";
-import dummy1 from "../../../assets/images/dummy/outfits/img-1.png";
-import dummy2 from "../../../assets/images/dummy/outfits/img-2.png";
-import dummy3 from "../../../assets/images/dummy/outfits/img-3.png";
-import dummy4 from "../../../assets/images/dummy/outfits/img-4.png";
-import dummy5 from "../../../assets/images/dummy/outfits/img-5.png";
-import dummy6 from "../../../assets/images/dummy/outfits/img-6.png";
-
-const dummyStartData = [dummy1, dummy2, dummy3, dummy4, dummy5, dummy6];
+import FilterBar from "@/components/common/FilterBar";
+import theme from "@/styles/theme";
+import { OUTFIT_FILTERS } from "@/constants/filterPresets";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
 const OutfitScreen = () => {
+  const router = useRouter();
   const { mode } = useLocalSearchParams();
-  const router = useRouter(); // Get the router object from expo-router
   const isSelectionMode = mode === "select";
 
-  const [clothingData, setClothingData] = useState(
-    dummyStartData.map((image, index) => ({
-      id: index + 1,
-      image: image,
-    }))
-  );
-
+  const [outfits, setOutfits] = useState([]);
+  const [filteredOutfits, setFilteredOutfits] = useState([]);
+  const [favoritedIds, setFavoritedIds] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
+
+  useEffect(() => {
+    const fetchOutfits = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "outfits"));
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setOutfits(data);
+        setFilteredOutfits(data);
+
+        const favorites = data.filter((item) => item.favorite).map((item) => item.id);
+        setFavoritedIds(favorites);
+      } catch (error) {
+        console.error("Error fetching outfits:", error);
+      }
+    };
+
+    fetchOutfits();
+  }, []);
 
   const toggleSelect = (id) => {
     setSelectedIds((prev) =>
@@ -37,11 +52,11 @@ const OutfitScreen = () => {
   };
 
   const handleSearch = () => {
-    // Add search logic here if needed
+    // placeholder for future search
   };
 
   const handleNewOutfit = () => {
-    router.push('outfits/NewOutfit'); // Correct placement of router.push inside the function
+    router.push("/outfits/NewOutfit");
   };
 
   const handleNext = () => {
@@ -49,6 +64,45 @@ const OutfitScreen = () => {
       pathname: "/collections/NewCollection",
       params: { selected: JSON.stringify(selectedIds) },
     });
+  };
+
+  const isFavorited = (id) => favoritedIds.includes(id);
+
+  const toggleFavorite = async (id) => {
+    const isNowFavorited = !isFavorited(id);
+    setFavoritedIds((prev) =>
+      isNowFavorited ? [...prev, id] : prev.filter((f) => f !== id)
+    );
+
+    try {
+      await updateDoc(doc(db, "outfits", id), {
+        favorite: isNowFavorited,
+      });
+      console.log(`❤️ Outfit ${id} favorite set to ${isNowFavorited}`);
+    } catch (err) {
+      console.error("Error updating outfit favorite status:", err);
+    }
+  };
+
+  const handleFilterChange = (filters) => {
+    const selectedTags = Object.entries(OUTFIT_FILTERS).reduce((acc, [key, options]) => {
+      acc[key] = options.filter((opt) => filters.includes(opt));
+      return acc;
+    }, {});
+
+    const includeFavorites = filters.includes("Favorited");
+
+    const filtered = outfits.filter((outfit) => {
+      const matchesTags = Object.entries(selectedTags).every(([key, values]) =>
+        values.length === 0 || values.some((v) => (outfit[key] || []).includes(v))
+      );
+
+      const matchesFavorite = includeFavorites ? outfit.favorite === true : true;
+
+      return matchesTags && matchesFavorite;
+    });
+
+    setFilteredOutfits(filtered);
   };
 
   return (
@@ -61,22 +115,22 @@ const OutfitScreen = () => {
         handleTextChange={handleSearch}
       />
 
+      <FilterBar filters={OUTFIT_FILTERS} onFilterChange={handleFilterChange} />
+
       <GridLayout
-        data={clothingData}
+        data={filteredOutfits}
         numColumns={2}
         isSelectable={isSelectionMode}
         selectedIds={selectedIds}
         toggleSelect={toggleSelect}
-        isFavorited={(id) => false} // Replace with real logic later
-        toggleFavorite={() => {}} // Optional for now
+        isFavorited={isFavorited}
+        toggleFavorite={toggleFavorite}
       />
 
       {isSelectionMode && selectedIds.length > 0 && (
         <View style={styles.nextButtonContainer}>
           <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-            <Text style={styles.nextButtonText}>
-              Next ({selectedIds.length})
-            </Text>
+            <Text style={styles.nextButtonText}>Next ({selectedIds.length})</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -95,7 +149,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   nextButton: {
-    backgroundColor: theme.colors.buttonBackground.dark, 
+    backgroundColor: theme.colors.buttonBackground.dark,
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 10,
@@ -105,7 +159,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  
 });
 
 export default OutfitScreen;

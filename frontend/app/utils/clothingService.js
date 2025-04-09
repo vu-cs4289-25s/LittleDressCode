@@ -41,12 +41,13 @@ export const addClothingItem = async (
 };
 
 export const updateFavoriteStatus = async (itemId, isFavorite) => {
+  console.log("🧪 updateFavoriteStatus called with:", { itemId, isFavorite });
   try {
     const itemRef = doc(db, "clothingItems", itemId);
     await updateDoc(itemRef, {
       favorite: isFavorite,
     });
-    console.log(`🔥 Favorite updated to ${isFavorite} for ${itemId}`);
+    console.log(`Favorite updated to ${isFavorite} for ${itemId}`);
   } catch (error) {
     console.error("Error updating favorite:", error);
   }

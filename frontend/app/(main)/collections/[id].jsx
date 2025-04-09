@@ -9,15 +9,6 @@ import TextField from "@/components/common/Textfield";
 import AccordionView from "@/components/AccordionView";
 import theme from "@/styles/theme";
 
-const dummyImages = {
-  1: require("@/assets/images/dummy/outfits/img-1.png"),
-  2: require("@/assets/images/dummy/outfits/img-2.png"),
-  3: require("@/assets/images/dummy/outfits/img-3.png"),
-  4: require("@/assets/images/dummy/outfits/img-4.png"),
-  5: require("@/assets/images/dummy/outfits/img-5.png"),
-  6: require("@/assets/images/dummy/outfits/img-6.png"),
-};
-
 const tagSections = [
   {
     id: "occasion",
@@ -116,16 +107,9 @@ const ViewCollectionScreen = () => {
 
   if (!collectionData) return <Text>Loading...</Text>;
 
-  // Build outfit list including dummy image references
-  const outfits = selectedOutfits.map((id) => ({
-    id,
-    image: dummyImages[id],
-  }));
-
-  // Add "Add new outfit" tile in edit mode
   const displayedGrid = isEditing
-    ? [{ id: "add", image: null }, ...outfits]
-    : outfits;
+    ? [{ id: "add", imageUrl: null }, ...selectedOutfits.map((id) => ({ id }))]
+    : selectedOutfits.map((id) => ({ id }));
 
   return (
     <View style={styles.container}>
@@ -155,7 +139,10 @@ const ViewCollectionScreen = () => {
                 isEditing && !selectedOutfits.includes(item.id) && styles.inactiveCard,
               ]}
             >
-              <item.image.type source={item.image.props.source} style={styles.image} />
+              <Image
+                source={{ uri: item.imageUrl || "https://via.placeholder.com/150" }}
+                style={styles.image}
+              />
             </TouchableOpacity>
           )
         }
