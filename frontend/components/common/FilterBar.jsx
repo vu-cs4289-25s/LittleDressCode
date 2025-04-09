@@ -95,7 +95,7 @@ const FilterBar = ({ onFilterChange }) => {
         style={styles.filterIcon}
         onPress={() => setModalVisible(true)}
       >
-        <Ionicons name="filter" size={20} color={theme.colors.text.lightest} />
+        <MaterialIcons name="tune" size={30} color={ theme.colors.buttonBackground.dark} />
       </TouchableOpacity>
 
       <ScrollView
@@ -153,10 +153,8 @@ const FilterBar = ({ onFilterChange }) => {
 const styles = StyleSheet.create({
   container: { flexDirection: "row", alignItems: "center", paddingLeft: 16 },
   filterIcon: {
-    backgroundColor: theme.colors.buttonBackground.dark,
-    borderRadius: theme.borderRadius.default,
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 10,

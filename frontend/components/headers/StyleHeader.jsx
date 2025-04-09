@@ -21,8 +21,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between", 
-    paddingTop: Platform.OS === "web" ? 32 : 50,
-    paddingBottom: 50,
+    paddingTop: Platform.OS === "web" ? 20 : 50,
+    paddingBottom: 10,
     paddingHorizontal: 16,
   },
   backButtonContainer: {
