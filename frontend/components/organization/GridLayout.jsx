@@ -38,18 +38,18 @@ const GridLayout = ({
 };
 
 const styles = StyleSheet.create({
-  grid: {
-    padding: 16,
-  },
   row: {
-    justifyContent: "space-between",
-    gap: 16,
+    justifyContent: 'space-between',
+  },
+  grid: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   gridItem: {
-    flex: 1,
+    flexBasis: '48%', // slightly less than 50% to leave room for margin
+    flexGrow: 0,
     marginBottom: 16,
-    aspectRatio: 1,
-  },
+  }
 });
 
 export default GridLayout;
