@@ -11,6 +11,8 @@ import {
   updateFavoriteStatus,
 } from "@/app/utils/clothingService";
 import { auth } from "@/app/utils/firebaseConfig";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 const ClosetScreen = () => {
   const router = useRouter();
@@ -88,11 +90,13 @@ const ClosetScreen = () => {
   }, []);
 
   // ✅ Fetch clothing items when user is ready
-  useEffect(() => {
-    if (userId) {
-      handleFilterChange([]);
-    }
-  }, [userId]);
+  useFocusEffect(
+    useCallback(() => {
+      if (userId) {
+        handleFilterChange([]);
+      }
+    }, [userId])
+  );
 
   if (isLoading) {
     return (
