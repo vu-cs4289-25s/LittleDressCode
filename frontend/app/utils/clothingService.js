@@ -1,4 +1,5 @@
 import { db } from "./firebaseConfig";
+import { auth } from "./firebaseConfig";
 import {
   collection,
   query,
@@ -21,6 +22,9 @@ export const addClothingItem = async (
   favorite
 ) => {
   try {
+    console.log("Submitting as:", userId);
+    console.log("Current auth UID:", auth.currentUser?.uid);
+
     const docRef = await addDoc(collection(db, "clothingItems"), {
       userId,
       name,
@@ -36,6 +40,9 @@ export const addClothingItem = async (
     });
     return docRef.id;
   } catch (error) {
+    console.log("Submitting as:", userId);
+    console.log("Current auth UID:", auth.currentUser?.uid);
+
     console.error("Error adding clothing item:", error);
   }
 };
@@ -82,7 +89,9 @@ export const getFilteredClothingItems = async (userId, selectedFilters) => {
       ];
 
       const matchesTags = tagFilters.every((filter) => tags.includes(filter));
-      const matchesFavorite = isFilteringFavorites ? item.favorite === true : true;
+      const matchesFavorite = isFilteringFavorites
+        ? item.favorite === true
+        : true;
 
       return matchesTags && matchesFavorite;
     });

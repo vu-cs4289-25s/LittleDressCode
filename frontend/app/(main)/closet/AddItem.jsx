@@ -9,16 +9,16 @@ import {
   TextInput,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import AccordionView from "../../../components/AccordionView"; 
+import AccordionView from "../../../components/AccordionView";
 import theme from "../../../styles/theme";
-import { addClothingItem } from "../../utils/clothingService"; 
-
+import { addClothingItem } from "../../utils/clothingService";
+import { auth } from "@/app/utils/firebaseConfig";
 const AddItem = () => {
   const { imageUrl } = useLocalSearchParams();
   const router = useRouter();
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedButtons, setSelectedButtons] = useState({}); 
+  const [selectedButtons, setSelectedButtons] = useState({});
   const [name, setName] = useState("");
 
   useEffect(() => {
@@ -27,43 +27,65 @@ const AddItem = () => {
         id: 1,
         title: "Category",
         buttons: [
-          { label: "Tops" }, { label: "Pants" }, { label: "Skirts" },
-          { label: "Dresses" }, { label: "Bags" }, { label: "Shoes" },
-          { label: "Outerwear" }, { label: "Jewelry" }, { label: "Hats" },
+          { label: "Tops" },
+          { label: "Pants" },
+          { label: "Skirts" },
+          { label: "Dresses" },
+          { label: "Bags" },
+          { label: "Shoes" },
+          { label: "Outerwear" },
+          { label: "Jewelry" },
+          { label: "Hats" },
         ],
       },
       {
         id: 2,
         title: "Color",
         buttons: [
-          { label: "Red" }, { label: "Blue" }, { label: "Black" },
-          { label: "White" }, { label: "Green" }, { label: "Yellow" },
-          { label: "Pink" }, { label: "Gray" }, { label: "Brown" },
-          { label: "Purple" }, { label: "Orange" }, { label: "Multicolor" },
+          { label: "Red" },
+          { label: "Blue" },
+          { label: "Black" },
+          { label: "White" },
+          { label: "Green" },
+          { label: "Yellow" },
+          { label: "Pink" },
+          { label: "Gray" },
+          { label: "Brown" },
+          { label: "Purple" },
+          { label: "Orange" },
+          { label: "Multicolor" },
         ],
       },
       {
         id: 3,
         title: "Style",
         buttons: [
-          { label: "Casual" }, { label: "Formal" }, { label: "Sporty" },
-          { label: "Streetwear" }, { label: "Boho" },
+          { label: "Casual" },
+          { label: "Formal" },
+          { label: "Sporty" },
+          { label: "Streetwear" },
+          { label: "Boho" },
         ],
       },
       {
         id: 4,
         title: "Season",
         buttons: [
-          { label: "Spring" }, { label: "Summer" },
-          { label: "Fall" }, { label: "Winter" }, { label: "Any" },
+          { label: "Spring" },
+          { label: "Summer" },
+          { label: "Fall" },
+          { label: "Winter" },
+          { label: "Any" },
         ],
       },
       {
         id: 5,
         title: "Fit",
         buttons: [
-          { label: "Tight" }, { label: "Regular" },
-          { label: "Loose" }, { label: "Oversized" },
+          { label: "Tight" },
+          { label: "Regular" },
+          { label: "Loose" },
+          { label: "Oversized" },
         ],
       },
     ]);
@@ -80,7 +102,7 @@ const AddItem = () => {
   };
 
   const saveClothingItem = async () => {
-    const userId = "testUser123"; // Replace with real user ID
+    const userId = auth.currentUser?.uid;
 
     const clothingData = {
       userId,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import GridLayout from "@/components/organization/GridLayout";
 import { uploadImage } from "@/app/utils/upload";
 import Header from "@/components/headers/Header";
@@ -10,13 +10,15 @@ import {
   getFilteredClothingItems,
   updateFavoriteStatus,
 } from "@/app/utils/clothingService";
+import { auth } from "@/app/utils/firebaseConfig";
 
 const ClosetScreen = () => {
   const router = useRouter();
-  const userId = "testUser123"; // Replace with real user ID
 
+  const [userId, setUserId] = useState(null);
   const [clothingData, setClothingData] = useState([]);
   const [favoritedIds, setFavoritedIds] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleUploadSuccess = (url) => {
     router.push({
@@ -46,6 +48,8 @@ const ClosetScreen = () => {
   };
 
   const handleFilterChange = async (filters) => {
+    if (!userId) return;
+
     console.log("🔍 Filters applied:", filters);
     try {
       const filtered = await getFilteredClothingItems(userId, filters);
@@ -65,12 +69,38 @@ const ClosetScreen = () => {
       setClothingData(firebaseData);
     } catch (err) {
       console.error("❌ Error filtering clothing items:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // ✅ Wait for Firebase to load the user
   useEffect(() => {
-    handleFilterChange([]);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        console.log("🚫 No user logged in.");
+      }
+    });
+
+    return unsubscribe;
   }, []);
+
+  // ✅ Fetch clothing items when user is ready
+  useEffect(() => {
+    if (userId) {
+      handleFilterChange([]);
+    }
+  }, [userId]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading your closet...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -78,12 +108,16 @@ const ClosetScreen = () => {
         title="My Closet"
         onPress={() => uploadImage(handleUploadSuccess)}
       />
-      <FilterBar filters={CLOTHING_FILTERS} onFilterChange={handleFilterChange} />
+      <FilterBar
+        filters={CLOTHING_FILTERS}
+        onFilterChange={handleFilterChange}
+      />
       <GridLayout
         data={clothingData}
         numColumns={2}
         isFavorited={isFavorited}
         toggleFavorite={toggleFavorite}
+        onItemPress={(item) => router.push(`/closet/${item.id}`)}
       />
     </View>
   );

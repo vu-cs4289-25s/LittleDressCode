@@ -10,7 +10,8 @@ const GridLayout = ({
   toggleSelect = () => {},
   isFavorited = () => false,
   toggleFavorite = () => {},
-  renderItem: customRenderItem = null, // Customizable for specific layout needs
+  renderItem: customRenderItem = null,
+  onItemPress = null, // ✅ new prop
 }) => {
   return (
     <FlatList
@@ -28,7 +29,10 @@ const GridLayout = ({
               toggleFavorite={() => toggleFavorite(item.id)}
               isSelectable={isSelectable}
               isSelected={selectedIds.includes(item.id)}
-              onSelect={() => toggleSelect(item.id)}
+              onSelect={
+                () =>
+                  isSelectable ? toggleSelect(item.id) : onItemPress?.(item) // ✅ trigger press if not selecting
+              }
             />
           </View>
         );
@@ -41,17 +45,17 @@ const GridLayout = ({
 
 const styles = StyleSheet.create({
   row: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   grid: {
     paddingHorizontal: 16,
     paddingTop: 16,
   },
   gridItem: {
-    flexBasis: '48%', // slightly less than 50% to leave room for margin
+    flexBasis: "48%", // slightly less than 50% to leave room for margin
     flexGrow: 0,
     marginBottom: 16,
-  }
+  },
 });
 
 export default GridLayout;

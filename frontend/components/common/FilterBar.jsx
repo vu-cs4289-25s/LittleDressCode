@@ -66,20 +66,36 @@ const FilterBar = ({ filters = {}, onFilterChange }) => {
         style={styles.filterIcon}
         onPress={() => setModalVisible(true)}
       >
-        <MaterialIcons name="tune" size={30} color={ theme.colors.buttonBackground.dark} />
+        <MaterialIcons
+          name="tune"
+          size={30}
+          color={theme.colors.buttonBackground.dark}
+        />
       </TouchableOpacity>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scroll}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.scroll}
+      >
         {visibleFilters.map((filter, idx) => (
           <TouchableOpacity
             key={idx}
-            onPress={() => toggleFilterWithApply(getCategoryForFilter(filter), filter)}
+            onPress={() =>
+              toggleFilterWithApply(getCategoryForFilter(filter), filter)
+            }
             style={[
               styles.tag,
               selectedFilters.includes(filter) && styles.tagSelected,
             ]}
           >
-            <Text style={selectedFilters.includes(filter) ? styles.textSelected : styles.text}>
+            <Text
+              style={
+                selectedFilters.includes(filter)
+                  ? styles.textSelected
+                  : styles.text
+              }
+            >
               {filter}
             </Text>
           </TouchableOpacity>
