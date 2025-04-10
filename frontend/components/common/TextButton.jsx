@@ -25,7 +25,7 @@ const TextButton = ({
       {img ? (
         <View style={styles.imgFormat}>
           <Image source={img} style={styles.img} />
-          <Text style={textStyle}>{title}</Text>
+          <Text style={[styles.buttonText, textStyle]}>{title}</Text>
         </View>
       ) : (
         <Text style={textStyle}>{title}</Text>
@@ -78,6 +78,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 

@@ -42,8 +42,8 @@ const theme = {
   },
   spacing: {
     small: 6,
-    medium: 8,
-    large: 10,
+    medium: 10,
+    large: 15,
   },
 
   borderRadius: {
