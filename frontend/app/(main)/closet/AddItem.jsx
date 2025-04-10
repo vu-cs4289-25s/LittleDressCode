@@ -7,12 +7,16 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  ScrollView,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import AccordionView from "../../../components/AccordionView";
 import theme from "../../../styles/theme";
 import { addClothingItem } from "../../utils/clothingService";
 import { auth } from "@/app/utils/firebaseConfig";
+import BackHeader from "@/components/headers/BackHeader";
+import TextButton from "@/components/common/TextButton";
+
 const AddItem = () => {
   const { imageUrl } = useLocalSearchParams();
   const router = useRouter();
@@ -137,36 +141,43 @@ const AddItem = () => {
 
   return (
     <View style={styles.container}>
+      <BackHeader />
       <Image source={{ uri: imageUrl }} style={styles.image} />
 
-      <Text style={{ marginBottom: 6, fontWeight: "bold" }}>Item Name</Text>
-      <TextInput
-        value={name}
-        onChangeText={setName}
-        placeholder="Enter item name"
-        style={{
-          height: 40,
-          borderColor: "#ccc",
-          borderWidth: 1,
-          borderRadius: 8,
-          paddingHorizontal: 12,
-          marginBottom: 12,
-        }}
-      />
-
-      {loading ? (
-        <ActivityIndicator size="large" color="blue" />
-      ) : (
-        <AccordionView
-          sections={sections}
-          selectedButtons={selectedButtons}
-          onSelectButton={handleSelectButton}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={{ marginBottom: 6, fontWeight: "bold" }}>Item Name</Text>
+        <TextInput
+          value={name}
+          onChangeText={setName}
+          placeholder="Enter item name"
+          style={{
+            height: 40,
+            borderColor: "#ccc",
+            borderWidth: 1,
+            borderRadius: 8,
+            paddingHorizontal: 12,
+            marginBottom: 12,
+          }}
         />
-      )}
 
-      <TouchableOpacity style={styles.saveButton} onPress={saveClothingItem}>
-        <Text style={styles.saveButtonText}>Add Item</Text>
-      </TouchableOpacity>
+        {loading ? (
+          <ActivityIndicator size="large" color="blue" />
+        ) : (
+          <AccordionView
+            sections={sections}
+            selectedButtons={selectedButtons}
+            onSelectButton={handleSelectButton}
+          />
+        )}
+      </ScrollView>
+      <View style={styles.containerButton}>
+        <TextButton
+          title="Add Item"
+          size="large"
+          color="dark"
+          onPress={saveClothingItem}
+        />
+      </View>
     </View>
   );
 };
@@ -193,10 +204,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 90,
   },
-  saveButtonText: {
-    color: theme.colors.text.lightest,
-    fontSize: 16,
-    fontWeight: "bold",
+  containerButton: {
+    padding: 16,
+    position: "absolute",
+    bottom: 25,
+    left: 0,
+    right: 0,
   },
 });
 

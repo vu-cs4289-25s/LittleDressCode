@@ -7,6 +7,7 @@ import {
   LayoutAnimation,
   UIManager,
   Platform,
+  Keyboard,
 } from "react-native";
 import Accordion from "react-native-collapsible/Accordion";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
@@ -64,7 +65,10 @@ const AccordionView = ({
   const renderHeader = (section, index, isActive) => (
     <TouchableOpacity
       style={[styles.header, !isActive && styles.headerBorder]}
-      onPress={() => handleUpdateSections(isActive ? [] : [index])}
+      onPress={() => {
+        Keyboard.dismiss();
+        handleUpdateSections(isActive ? [] : [index]);
+      }}
       activeOpacity={1}
     >
       <View style={styles.headerContent}>
@@ -145,14 +149,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   iconStyle: {
-    width: 25
+    width: 25,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
-    paddingLeft: 0, 
+    paddingLeft: 0,
     paddingRight: 0,
     backgroundColor: theme.colors.backgrounds.primary,
   },

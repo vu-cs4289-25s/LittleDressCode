@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   containerButton: {
     padding: 16,
     position: "absolute",
-    bottom: 16,
+    bottom: 20,
     left: 0,
     right: 0,
   },
