@@ -11,10 +11,11 @@ import Modal from "../common/Modal";
 import theme from "../../styles/theme";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AccordionView from "../AccordionView";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const MAX_VISIBLE = 10;
 
-const FilterBar = ({ filters, onFilterChange }) => {
+const FilterBar = ({ filters = {}, onFilterChange }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [visibleFilters, setVisibleFilters] = useState([]);

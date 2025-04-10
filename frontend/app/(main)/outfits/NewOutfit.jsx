@@ -10,16 +10,17 @@ import {
 } from "react-native";
 import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "@/app/utils/firebaseConfig";
-import StyleHeader from "@/components/headers/StyleHeader";
+import StyleHeader from "@/components/headers/BackHeader";
 import TextButton from "@/components/common/TextButton";
 import ItemContainer from "@/components/organization/ItemContainer";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Draggable from "react-draggable";
 import theme from "@/styles/theme";
+import { useRouter } from "expo-router";
 
 // Categories & Tabs
 const categories = ["All", "Tops", "Pants", "Shoes", "Jackets"];
-const tabs = ["Mix & Match", "Canvas", "Use AI"];
+const tabs = ["Mix & Match", "Canvas"];
 
 const DraggableItem = ({ image, id, position, onSavePosition }) => {
   const handleStop = (e, data) => {
@@ -63,13 +64,17 @@ const NewOutfit = () => {
   const [tops, setTops] = useState([]);
   const [bottoms, setBottoms] = useState([]);
   const [shoes, setShoes] = useState([]);
+  const router = useRouter(); // Get the router object from expo-router
 
   useEffect(() => {
     const fetchClothingItems = async () => {
       try {
         const q = query(collection(db, "clothingItems"));
         const snapshot = await getDocs(q);
-        const items = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const items = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
         setClothingData(items);
         setTops(items.filter((item) => item.category?.includes("Tops")));
@@ -128,7 +133,7 @@ const NewOutfit = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.bigContainer}>
         <View style={styles.container}>
-          <StyleHeader />
+          <StyleHeader title={"Styling"} />
         </View>
 
         <View style={styles.tabHeader}>
@@ -228,14 +233,15 @@ const NewOutfit = () => {
           </View>
         )}
 
-        {selectedTab === "Use AI" && (
-          <View style={styles.container}>
-            <Text>ai</Text>
-          </View>
-        )}
-
         <View style={styles.containerButton}>
-          <TextButton title="Next" size="large" color="dark" onPress={() => {}} />
+          <TextButton
+            title="Next"
+            size="large"
+            color="dark"
+            onPress={() => {
+              router.push("outfits/OutfitCompletion"); // Correct placement of router.push inside the function
+            }}
+          />
         </View>
       </View>
     </GestureHandlerRootView>
@@ -281,7 +287,7 @@ const styles = StyleSheet.create({
   tabButton: {
     paddingVertical: 12,
     paddingHorizontal: 18,
-    width: "33.33%",
+    width: "50%",
     alignItems: "center",
   },
   tabButtonActive: {
