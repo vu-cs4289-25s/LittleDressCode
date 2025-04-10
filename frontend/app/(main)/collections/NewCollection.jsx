@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ScrollView, Button } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
-import { getAuth } from "firebase/auth";
 import { collection, getDocs } from "firebase/firestore";
 
 import Header from "@/components/headers/Header";
 import ItemContainer from "@/components/organization/ItemContainer";
 import TextField from "@/components/common/Textfield";
 import AccordionView from "@/components/AccordionView";
-import { db } from "@/app/utils/firebaseConfig";
+import { auth, db } from "@/app/utils/firebaseConfig";
 import { addCollection } from "@/app/utils/collectionsService";
 
 const NewCollection = () => {
@@ -23,8 +22,13 @@ const NewCollection = () => {
     const fetchOutfits = async () => {
       try {
         const snapshot = await getDocs(collection(db, "outfits"));
-        const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        const selectedOutfits = data.filter((item) => selectedIds.includes(item.id));
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        const selectedOutfits = data.filter((item) =>
+          selectedIds.includes(item.id)
+        );
         setOutfits(selectedOutfits);
       } catch (error) {
         console.error("Error fetching outfits:", error);
@@ -72,7 +76,7 @@ const NewCollection = () => {
   };
 
   const handleSave = async () => {
-    const userId = getAuth().currentUser?.uid;
+    const userId = auth.currentUser?.uid;
     if (!userId || !name.trim()) {
       console.warn("Missing user or name");
       return;

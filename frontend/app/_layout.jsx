@@ -4,6 +4,18 @@ import { useEffect, useState } from "react";
 import { auth } from "./utils/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { ActivityIndicator, View, Text } from "react-native";
+import * as Linking from "expo-linking";
+
+const linking = {
+  prefixes: ["closetapp://"],
+  config: {
+    screens: {
+      closet: "closet/:id",
+      outfits: "outfits/:id",
+      collections: "collections/:id",
+    },
+  },
+};
 
 export default function RootLayout() {
   const [user, setUser] = useState(null);
@@ -13,16 +25,18 @@ export default function RootLayout() {
   useEffect(() => {
     console.log("🚀 Starting Firebase Auth Check...");
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log("🔥 Auth State Changed:", currentUser ? currentUser.email : "No user logged in");
+      console.log(
+        "🔥 Auth State Changed:",
+        currentUser ? currentUser.email : "No user logged in"
+      );
       setUser(currentUser);
       setLoading(false);
-      
-      // Delay navigation to avoid early navigation error
+
       if (!currentUser) {
         setTimeout(() => {
-          console.log("🔄 Forcing navigation to /login...");
-          router.replace("/login"); // Ensure this is a valid route
-        }, 100); // Small delay ensures navigation system is ready
+          console.log("🔄 Redirecting to /login...");
+          router.replace("/login");
+        }, 100);
       }
     });
 
@@ -40,7 +54,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack screenOptions={{ headerShown: false }} linking={linking}>
         {user ? (
           <Stack.Screen name="(main)" options={{ headerShown: false }} />
         ) : (

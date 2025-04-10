@@ -30,7 +30,7 @@ const ItemContainer = ({
   }, [clothingItem]);
 
   return (
-    <Pressable onPress={isSelectable ? onSelect : null}>
+    <Pressable onPress={onSelect}>
       <View style={[isSolo ? styles.boxSolo : styles.box]}>
         {/* Top-right icon */}
         {showControls && (
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   },
   boxSolo: {
     width: 180,
-    height:180,
+    height: 180,
     paddingHorizontal: 17,
     paddingVertical: 16,
     justifyContent: "center",
