@@ -1,17 +1,14 @@
 import React from "react";
-import { Platform, View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import theme from "@/styles/theme";
 import AddButton from "../buttons/AddButton";
 import TextField from "../common/Textfield";
-import BackButton from "../common/BackButton";
 
 const Header = ({
   title,
   onPress,
   handleTextChange,
-  showBackButton = false,
-  backTo = null,
   showSearch = true,
 }) => {
   return (
@@ -19,7 +16,6 @@ const Header = ({
       <View style={styles.container}>
         <View style={styles.main}>
           <View style={styles.titleRow}>
-            {showBackButton && <BackButton to={backTo} />}
             <Text style={styles.title}>{title}</Text>
           </View>
           {onPress && <AddButton onPress={onPress} />}
