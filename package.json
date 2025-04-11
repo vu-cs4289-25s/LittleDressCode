@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "firebase": "latest",
+    "firebase": "^11.5.0",
     "undefined": "expo-auth-session/providers/google"
   }
 }
