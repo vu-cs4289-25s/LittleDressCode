@@ -10,6 +10,7 @@ import {
   doc,
 } from "firebase/firestore";
 
+// Remove the addCustomTag function - we don't need it anymore
 export const addClothingItem = async (
   userId,
   name,
@@ -44,6 +45,7 @@ export const addClothingItem = async (
     console.log("Current auth UID:", auth.currentUser?.uid);
 
     console.error("Error adding clothing item:", error);
+    throw error;
   }
 };
 
