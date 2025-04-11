@@ -5,6 +5,7 @@ import { auth } from "./utils/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { ActivityIndicator, View, Text } from "react-native";
 import * as Linking from "expo-linking";
+import { UserProvider } from "../context/UserContext"; 
 
 const linking = {
   prefixes: ["closetapp://"],
@@ -53,6 +54,7 @@ export default function RootLayout() {
   }
 
   return (
+    <UserProvider>
     <SafeAreaProvider>
       <Stack screenOptions={{ headerShown: false }} linking={linking}>
         {user ? (
@@ -62,5 +64,6 @@ export default function RootLayout() {
         )}
       </Stack>
     </SafeAreaProvider>
+    </UserProvider>
   );
 }
