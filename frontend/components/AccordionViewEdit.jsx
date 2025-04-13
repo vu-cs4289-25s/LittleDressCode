@@ -1,23 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  LayoutAnimation,
-  UIManager,
-  Platform,
-  Keyboard,
   TextInput,
+  Platform,
+  UIManager,
+  LayoutAnimation,
   ActivityIndicator,
+  Keyboard,
 } from "react-native";
 import Accordion from "react-native-collapsible/Accordion";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import theme from "../styles/theme";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import TextButton from "./common/TextButton";
+import theme from "../styles/theme";
 
 if (
   Platform.OS === "android" &&
@@ -26,19 +25,33 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const AccordionView = ({
-  sections,
-  selectedButtons,
-  onSelectButton,
-}) => {
+const AccordionViewEdit = ({ sections, initialTags = {}, onTagChange }) => {
   const [activeSections, setActiveSections] = useState([]);
+  const [selectedTags, setSelectedTags] = useState(initialTags);
   const [customInputs, setCustomInputs] = useState({});
   const [isAdding, setIsAdding] = useState({});
   const [addingTag, setAddingTag] = useState(false);
 
+  useEffect(() => {
+    onTagChange?.(selectedTags);
+  }, [selectedTags]);
+
   const handleUpdateSections = (sections) => {
     LayoutAnimation.easeInEaseOut();
     setActiveSections(sections);
+  };
+
+  const handleSelectButton = (sectionId, tag) => {
+    setSelectedTags((prev) => {
+      const alreadySelected = prev[sectionId]?.includes(tag);
+      const updated = {
+        ...prev,
+        [sectionId]: alreadySelected
+          ? prev[sectionId].filter((t) => t !== tag)
+          : [...(prev[sectionId] || []), tag],
+      };
+      return updated;
+    });
   };
 
   const toggleAddInput = (sectionId) => {
@@ -57,10 +70,9 @@ const AccordionView = ({
 
   const handleAddCustomTag = (sectionId) => {
     if (!customInputs[sectionId]?.trim()) return;
-    
     setAddingTag(true);
-    onSelectButton(sectionId, customInputs[sectionId]);
-    
+    handleSelectButton(sectionId, customInputs[sectionId]);
+
     setTimeout(() => {
       setCustomInputs((prev) => ({
         ...prev,
@@ -71,25 +83,23 @@ const AccordionView = ({
         [sectionId]: false,
       }));
       setAddingTag(false);
-    }, 500);
+    }, 300);
   };
 
   const getIconForSection = (title) => {
     switch (title) {
       case "Season":
-        return <MaterialIcons name="sunny" color="#261BAC" size={20} />;
+        return <MaterialIcons name="sunny" size={20} color="#261BAC" />;
       case "Occasion":
         return <MaterialCommunityIcons name="party-popper" size={20} color="#FF9F0A" />;
       case "Category":
-        return <FontAwesome6 name="shirt" color="#734230" size={18} />;
+        return <FontAwesome6 name="shirt" size={18} color="#734230" />;
       case "Color":
-        return <MaterialIcons name="palette" color="#FF9F0A" size={20} />;
+        return <MaterialIcons name="palette" size={20} color="#FF9F0A" />;
       case "Style":
-        return <MaterialIcons name="style" color="#E1289B" size={20} />;
+        return <MaterialIcons name="style" size={20} color="#E1289B" />;
       case "Fit":
-        return <MaterialIcons name="accessibility" color="#096B91" size={20} />;
-      case "Other filters":
-        return <MaterialIcons name="cloud" color="#CCCCCC" size={20} />;
+        return <FontAwesome5 name="ruler-vertical" size={18} color="#096B91" />;
       default:
         return null;
     }
@@ -117,32 +127,37 @@ const AccordionView = ({
   );
 
   const renderContent = (section, _, isActive) => {
+    const existing = selectedTags[section.id] || [];
     const allButtons = [...section.buttons];
-    
-    selectedButtons[section.id]?.forEach(tag => {
-      if (!section.buttons.some(btn => btn.label === tag)) {
+
+    existing.forEach((tag) => {
+      if (!allButtons.some((btn) => btn.label === tag)) {
         allButtons.push({ label: tag });
       }
     });
 
     return (
-      <View style={[styles.content, isActive ? styles.expanded : styles.collapsed]}>
+      <View style={styles.content}>
         <View style={styles.buttonContainer}>
           {allButtons.map((button, index) => {
-            const isSelected = selectedButtons[section.id]?.includes(button.label);
-
-          return (
-            <View key={index}>
-              <TextButton
-                title={button.label}
-                size="small"
-                color={isSelected ? "dark" : "light"}
-                onPress={() => onSelectButton(section.id, button.label)}
-                sty
-              />
-            </View>
+            const isSelected = existing.includes(button.label);
+            return (
+              <TouchableOpacity
+                key={`${section.id}-${button.label}-${index}`}
+                style={[
+                  styles.accordionButton,
+                  isSelected ? styles.selectedButton : styles.unselectedButton,
+                ]}
+                onPress={() => handleSelectButton(section.id, button.label)}
+                disabled={addingTag}
+              >
+                <Text style={isSelected ? styles.selectedText : styles.deselectedText}>
+                  {button.label}
+                </Text>
+              </TouchableOpacity>
+            );
           })}
-          
+
           {isAdding[section.id] ? (
             <View style={styles.customInputContainer}>
               <TextInput
@@ -202,7 +217,7 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 5,
   },
   iconStyle: {
     width: 25,
@@ -211,7 +226,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 15,
+    padding: 16,
     paddingLeft: 0,
     paddingRight: 0,
     backgroundColor: theme.colors.backgrounds.primary,
@@ -226,8 +241,6 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 10,
-    paddingTop: 0,
-    backgroundColor: theme.colors.backgrounds.primary,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -242,8 +255,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    minWidth: 20,
-    maxWidth: "auto",
     alignSelf: "flex-start",
     marginRight: 8,
   },
@@ -280,6 +291,9 @@ const styles = StyleSheet.create({
     minWidth: 120,
     color: theme.colors.text.dark,
   },
+  sectionContainer: {
+    marginBottom: 10,
+  },
 });
 
-export default AccordionView;
+export default AccordionViewEdit;

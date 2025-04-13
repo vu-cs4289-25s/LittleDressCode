@@ -25,6 +25,7 @@ const AddItem = () => {
   const [selectedButtons, setSelectedButtons] = useState({});
   const [name, setName] = useState("");
 
+  
   useEffect(() => {
     setSections([
       {
@@ -104,7 +105,7 @@ const AddItem = () => {
         : [...(prev[categoryId] || []), tag],
     }));
   };
-
+  
   const saveClothingItem = async () => {
     const userId = auth.currentUser?.uid;
 

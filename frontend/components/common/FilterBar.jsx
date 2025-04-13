@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import Modal from "../common/Modal";
 import theme from "../../styles/theme";
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AccordionView from "../AccordionView";
 import { MaterialIcons } from "@expo/vector-icons";
