@@ -16,7 +16,7 @@ import AccordionViewEdit from "@/components/AccordionViewEdit";
 import ShareButton from "@/components/buttons/ShareButton";
 import TextButton from "@/components/common/TextButton";
 import TextField from "@/components/common/Textfield";
-import DeleteButton from '@/components/common/DeleteIcon';
+import DeleteButton from "@/components/common/DeleteIcon";
 
 const ClosetDetail = () => {
   const { id } = useLocalSearchParams();
@@ -35,40 +35,65 @@ const ClosetDetail = () => {
         id: 1,
         title: "Category",
         buttons: [
-          { label: "Tops" }, { label: "Pants" }, { label: "Skirts" },
-          { label: "Dresses" }, { label: "Bags" }, { label: "Shoes" },
-          { label: "Outerwear" }, { label: "Jewelry" }, { label: "Hats" },
+          { label: "Tops" },
+          { label: "Pants" },
+          { label: "Skirts" },
+          { label: "Dresses" },
+          { label: "Bags" },
+          { label: "Shoes" },
+          { label: "Outerwear" },
+          { label: "Jewelry" },
+          { label: "Hats" },
         ],
       },
       {
         id: 2,
         title: "Color",
         buttons: [
-          { label: "Red" }, { label: "Blue" }, { label: "Black" }, { label: "White" },
-          { label: "Green" }, { label: "Yellow" }, { label: "Pink" }, { label: "Gray" },
-          { label: "Brown" }, { label: "Purple" }, { label: "Orange" }, { label: "Multicolor" },
+          { label: "Red" },
+          { label: "Blue" },
+          { label: "Black" },
+          { label: "White" },
+          { label: "Green" },
+          { label: "Yellow" },
+          { label: "Pink" },
+          { label: "Gray" },
+          { label: "Brown" },
+          { label: "Purple" },
+          { label: "Orange" },
+          { label: "Multicolor" },
         ],
       },
       {
         id: 3,
         title: "Style",
         buttons: [
-          { label: "Casual" }, { label: "Formal" }, { label: "Sporty" },
-          { label: "Streetwear" }, { label: "Boho" },
+          { label: "Casual" },
+          { label: "Formal" },
+          { label: "Sporty" },
+          { label: "Streetwear" },
+          { label: "Boho" },
         ],
       },
       {
         id: 4,
         title: "Season",
         buttons: [
-          { label: "Spring" }, { label: "Summer" }, { label: "Fall" }, { label: "Winter" }, { label: "Any" },
+          { label: "Spring" },
+          { label: "Summer" },
+          { label: "Fall" },
+          { label: "Winter" },
+          { label: "Any" },
         ],
       },
       {
         id: 5,
         title: "Fit",
         buttons: [
-          { label: "Tight" }, { label: "Regular" }, { label: "Loose" }, { label: "Oversized" },
+          { label: "Tight" },
+          { label: "Regular" },
+          { label: "Loose" },
+          { label: "Oversized" },
         ],
       },
     ]);
@@ -135,21 +160,21 @@ const ClosetDetail = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-<View style={styles.header}>
-  <DeleteButton 
-    itemId={id}
-    onSuccess={() => {
-      Alert.alert("Item Deleted");
-      router.back();
-    }}
-    color="black"
-    size={26}
-    buttonStyle={styles.deleteButton}
-  />
-  <ShareButton type="closet" id={id} refToCapture={detailRef} />
-</View>
+      <View style={styles.header}>
+        <DeleteButton
+          itemId={id}
+          onSuccess={() => {
+            Alert.alert("Item Deleted");
+            router.back();
+          }}
+          color="black"
+          size={26}
+          buttonStyle={styles.deleteButton}
+        />
+        <ShareButton type="closet" id={id} refToCapture={detailRef} />
+      </View>
 
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
@@ -159,19 +184,19 @@ const ClosetDetail = () => {
             style={styles.image}
             resizeMode="contain"
           />
-           <View style={styles.nameInputContainer}>
-  {itemData?.name ? (
-    <Text style={styles.inputLabel}>{itemData.name}</Text>
-  ) : (
-    <Text style={styles.inputLabel}>Item Name</Text>
-  )}
-  <TextField
-    size="large"
-    onChangeText={setName}
-    value={name}
-    placeholder="Edit item name"
-  />
-</View>
+          <View style={styles.nameInputContainer}>
+            {itemData?.name ? (
+              <Text style={styles.inputLabel}>{itemData.name}</Text>
+            ) : (
+              <Text style={styles.inputLabel}>Item Name</Text>
+            )}
+            <TextField
+              size="large"
+              onChangeText={setName}
+              value={name}
+              placeholder="Edit item name"
+            />
+          </View>
 
           <View style={styles.accordionContainer}>
             <AccordionViewEdit
@@ -182,11 +207,11 @@ const ClosetDetail = () => {
           </View>
 
           <View style={styles.buttonWrapper}>
-            <TextButton 
-              title="Save Changes" 
-              size="large" 
-              color="dark" 
-              onPress={handleSave} 
+            <TextButton
+              title="Save Changes"
+              size="large"
+              color="dark"
+              onPress={handleSave}
             />
           </View>
         </View>

@@ -12,7 +12,6 @@ import theme from "../../styles/theme";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AccordionView from "../AccordionView";
-import { MaterialIcons } from "@expo/vector-icons";
 
 const MAX_VISIBLE = 10;
 
