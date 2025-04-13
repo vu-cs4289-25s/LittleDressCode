@@ -14,7 +14,8 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.icons.medium,
+        tabBarActiveTintColor: theme.colors.icons.dark,
+        tabBarInactiveTintColor: theme.colors.icons.medium,
         headerShown: false,
         tabBarStyle: Platform.select({
           ios: {
@@ -39,22 +40,22 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-  name="outfits"
-  options={{
-    title: "Outfits",
-    tabBarIcon: ({ color }) => (
-      <FontAwesome6 name="shirt" size={24} color={color} />
-    ),
-  }}
-  listeners={{
-    tabPress: (e) => {
-      // Prevent default behavior
-      e.preventDefault();
-      // Navigate explicitly to /outfits with no query string
-      router.replace("/outfits");
-    },
-  }}
-/>
+        name="outfits"
+        options={{
+          title: "Outfits",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 name="shirt" size={24} color={color} />
+          ),
+        }}
+        listeners={{
+          tabPress: (e) => {
+            // Prevent default behavior
+            e.preventDefault();
+            // Navigate explicitly to /outfits with no query string
+            router.replace("/outfits");
+          },
+        }}
+      />
 
       <Tabs.Screen
         name="closet"
@@ -67,15 +68,6 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="index"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color }) => (
-            <Entypo name="home" size={24} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="collections"
         options={{
           title: "Collections",
           tabBarIcon: ({ color }) => (

@@ -28,9 +28,9 @@ const ItemContainer = ({
     if (clothingItem) {
       if (isOutfit && Array.isArray(clothingItem.clothingItems)) {
         const urls = clothingItem.clothingItems.map((item) => item.imageUrl);
-        setImageSource(urls); // Now imageSource is just an array of URLs
+        setImageSource(urls);
       } else {
-        setImageSource(clothingItem); // For single image
+        setImageSource(clothingItem);
       }
       setLoading(false);
     }
@@ -79,18 +79,18 @@ const ItemContainer = ({
         {loading ? (
           <ActivityIndicator size="large" color="#000" />
         ) : isOutfit && Array.isArray(imageSource) ? (
-          <View style={styles.outfitCircle}>
-            {imageSource.map((src, index) => {
-              console.log(src);
-              return (
-                <Image
-                  key={index}
-                  source={{ uri: src }}
-                  style={[styles.outfitImage, outfitImagePositions[index]]}
-                  resizeMode="cover"
-                />
-              );
-            })}
+          <View style={styles.outfitRow}>
+            {imageSource.map((src, index) => (
+              <Image
+                key={index}
+                source={{ uri: src }}
+                style={[
+                  styles.outfitImageRow,
+                  { marginLeft: index === 0 ? 0 : -20 }, 
+                ]}
+                resizeMode="cover"
+              />
+            ))}
           </View>
         ) : (
           <Image
@@ -142,18 +142,15 @@ const styles = StyleSheet.create({
     position: "absolute",
     borderColor: "#fff",
   },
-});
-
-const outfitImagePositions = [
-  { top: 0, left: "50%", transform: [{ translateX: -30 }] },
-  { top: "50%", left: 0, transform: [{ translateY: -30 }] },
-  { top: "50%", right: 0, transform: [{ translateY: -30 }] },
-  { bottom: 0, left: "50%", transform: [{ translateX: -30 }] },
-  {
-    top: "50%",
-    left: "50%",
-    transform: [{ translateX: -30 }, { translateY: -30 }],
+  outfitRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
-];
+  outfitImageRow: {
+    width: 60,
+    height: 60,
+  },
+});
 
 export default ItemContainer;

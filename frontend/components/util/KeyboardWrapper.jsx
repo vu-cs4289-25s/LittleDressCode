@@ -1,13 +1,18 @@
 import React from "react";
-import { TouchableWithoutFeedback, Keyboard, View } from "react-native";
+import { Pressable, Keyboard, View } from "react-native";
 
-
-// This component is so the keyboard will not stay present when user isn't typing
 const KeyboardDismissWrapper = ({ children }) => {
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={{ flex: 1 }}>{children}</View>
-    </TouchableWithoutFeedback>
+    <Pressable
+      onPress={Keyboard.dismiss}
+      style={{ flex: 1 }}
+    >
+      {({ pressed }) => (
+        <View style={{ flex: 1, opacity: pressed ? 0.99 : 1 }}>
+          {children}
+        </View>
+      )}
+    </Pressable>
   );
 };
 

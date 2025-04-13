@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     padding: 16,
+    paddingBottom: 0,
   },
 });
 

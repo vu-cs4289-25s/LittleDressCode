@@ -29,21 +29,6 @@ const OutfitCompletion = () => {
   useEffect(() => {
     setSections([
       {
-        id: 1,
-        title: "Category",
-        buttons: [
-          { label: "Tops" },
-          { label: "Pants" },
-          { label: "Skirts" },
-          { label: "Dresses" },
-          { label: "Bags" },
-          { label: "Shoes" },
-          { label: "Outerwear" },
-          { label: "Jewelry" },
-          { label: "Hats" },
-        ],
-      },
-      {
         id: 3,
         title: "Style",
         buttons: [

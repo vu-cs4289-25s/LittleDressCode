@@ -4,6 +4,8 @@ import { useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import { auth } from "@/app/utils/firebaseConfig";
 import { UserContext } from "@/context/UserContext";
+import { SafeAreaView } from "react-native-safe-area-context";
+import theme from "@/styles/theme";
 
 const ProfileScreen = () => {
   const router = useRouter();
@@ -19,25 +21,33 @@ const ProfileScreen = () => {
   };
 
   const menuItems = [
-    { label: "Personal Details", onPress: () => router.push("/(main)/profile/Settings") },
-    { label: "Settings", onPress: () => router.push("/(main)/profile/Settings") },
+    {
+      label: "Personal Details",
+      onPress: () => router.push("/(main)/profile/Settings"),
+    },
+    {
+      label: "Settings",
+      onPress: () => router.push("/(main)/profile/Settings"),
+    },
     { label: "Help and Support", onPress: () => {} },
     { label: "Logout", onPress: handleLogout },
   ];
 
   return (
     <View style={styles.container}>
-      <View style={styles.avatarContainer}>
-        <Image
-          source={
-            user?.photo
-              ? { uri: user.photo }
-              : require("@/assets/images/avatar-placeholder.png")
-          }
-          style={styles.avatar}
-        />
-        <Text style={styles.username}>{user?.firstName || "User"}</Text>
-      </View>
+      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+        <View style={styles.avatarContainer}>
+          <Image
+            source={
+              user?.photo
+                ? { uri: user.photo }
+                : require("@/assets/images/avatar-placeholder.png")
+            }
+            style={styles.avatar}
+          />
+          <Text style={styles.username}>{user?.firstName || "User"}</Text>
+        </View>
+      </SafeAreaView>
 
       <View style={styles.actions}>
         {menuItems.map((item, index) => (
@@ -58,12 +68,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    paddingTop: 60,
-    paddingHorizontal: 30,
+    paddingTop: 16,
+    paddingHorizontal: 32,
   },
   avatarContainer: {
     alignItems: "center",
     marginBottom: 40,
+  },
+  safeArea: {
+    backgroundColor: "white",
   },
   avatar: {
     width: 100,
@@ -77,10 +90,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   actions: {
-    gap: 12,
+    gap: 0,
   },
   button: {
-    backgroundColor: "#E0E0E0",
+    backgroundColor: theme.colors.buttonBackground.light,
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 8,

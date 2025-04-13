@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  TouchableOpacity,
   Alert,
   Switch,
 } from "react-native";
@@ -13,7 +12,8 @@ import { UserContext } from "@/context/UserContext";
 import { db } from "@/app/utils/firebaseConfig";
 import { doc, updateDoc } from "firebase/firestore";
 import { useRouter } from "expo-router";
-
+import StyleHeader from "../../../components/headers/BackHeader";
+import TextButton from "@/components/common/TextButton";
 
 export default function SettingsScreen() {
   const { user } = useContext(UserContext);
@@ -45,101 +45,104 @@ export default function SettingsScreen() {
   };
 
   return (
-    
-    <View style={styles.container}>
-        <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                <MaterialIcons name="arrow-back-ios" size={24} color="#333" />
-            </TouchableOpacity>
+    <View style={styles.bigContainer}>
+      <View style={styles.container}>
+        <StyleHeader title={"Settings"} />
+      </View>
+      <View style={styles.containerMain}>
+        <View style={styles.field}>
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            value={firstName}
+            onChangeText={setFirstName}
+          />
+          <MaterialIcons name="edit" size={20} color="#333" />
         </View>
 
-      <Text style={styles.title}>Settings</Text>
+        <View style={styles.field}>
+          <TextInput
+            style={styles.input}
+            placeholder="Surname"
+            value={lastName}
+            onChangeText={setLastName}
+          />
+          <MaterialIcons name="edit" size={20} color="#333" />
+        </View>
 
-      <View style={styles.field}>
-        <TextInput
-          style={styles.input}
-          placeholder="Name"
-          value={firstName}
-          onChangeText={setFirstName}
-        />
-        <MaterialIcons name="edit" size={20} color="#333" />
+        <View style={styles.field}>
+          <TextInput
+            style={styles.input}
+            placeholder="Username"
+            value={firstName + lastName}
+            editable={false}
+          />
+          <MaterialIcons name="edit" size={20} color="#999" />
+        </View>
+
+        <View style={styles.field}>
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            secureTextEntry
+            onChangeText={setPassword}
+          />
+          <MaterialIcons name="edit" size={20} color="#333" />
+        </View>
+
+        <View style={styles.field}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email Address"
+            value={email}
+            onChangeText={setEmail}
+          />
+          <MaterialIcons name="edit" size={20} color="#333" />
+        </View>
+
+        <View style={styles.field}>
+          <TextInput
+            style={styles.input}
+            placeholder="Mobile Number"
+            value={mobile}
+            onChangeText={setMobile}
+          />
+          <MaterialIcons name="edit" size={20} color="#333" />
+        </View>
+
+        <Text style={styles.sectionTitle}>Notifications</Text>
+        <View style={styles.toggleContainer}>
+          <Text style={styles.toggleLabel}>Enable / Disable Notifications</Text>
+          <Switch
+            value={notificationsEnabled}
+            onValueChange={setNotificationsEnabled}
+          />
+        </View>
+
+        <TextButton title="Save Changes" size="large" color="dark" onPress={handleSave} />
       </View>
-
-      <View style={styles.field}>
-        <TextInput
-          style={styles.input}
-          placeholder="Surname"
-          value={lastName}
-          onChangeText={setLastName}
-        />
-        <MaterialIcons name="edit" size={20} color="#333" />
-      </View>
-
-      <View style={styles.field}>
-        <TextInput
-          style={styles.input}
-          placeholder="Username"
-          value={firstName + lastName}
-          editable={false}
-        />
-        <MaterialIcons name="edit" size={20} color="#999" />
-      </View>
-
-      <View style={styles.field}>
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          secureTextEntry
-          onChangeText={setPassword}
-        />
-        <MaterialIcons name="edit" size={20} color="#333" />
-      </View>
-
-      <View style={styles.field}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email Address"
-          value={email}
-          onChangeText={setEmail}
-        />
-        <MaterialIcons name="edit" size={20} color="#333" />
-      </View>
-
-      <View style={styles.field}>
-        <TextInput
-          style={styles.input}
-          placeholder="Mobile Number"
-          value={mobile}
-          onChangeText={setMobile}
-        />
-        <MaterialIcons name="edit" size={20} color="#333" />
-      </View>
-
-    
-      <Text style={styles.sectionTitle}>Notifications</Text>
-      <View style={styles.toggleContainer}>
-        <Text style={styles.toggleLabel}>Enable / Disable Notifications</Text>
-        <Switch
-          value={notificationsEnabled}
-          onValueChange={setNotificationsEnabled}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save Changes</Text>
-      </TouchableOpacity>
     </View>
-
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "white",
+    paddingTop: 32,
+    gap: 20,
+  },
+  containerMain: {
+    backgroundColor: "white",
+    padding: 32,
+    gap: 20,
+  },
+
+  bigContainer: {
     flex: 1,
-    backgroundColor: "#fff",
-    paddingHorizontal: 30,
-    paddingTop: 40,
+    backgroundColor: "white",
+    paddingBottom: 80,
+    position: "relative",
   },
   title: {
     fontSize: 26,
@@ -174,17 +177,6 @@ const styles = StyleSheet.create({
   toggleLabel: {
     fontSize: 16,
     color: "#333",
-  },
-  saveButton: {
-    backgroundColor: "#000",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
   },
   header: {
     flexDirection: "row",
