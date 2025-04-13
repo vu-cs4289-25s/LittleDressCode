@@ -8,18 +8,18 @@ export const CLOTHING_FILTERS = {
     Style: ["Casual", "Formal", "Streetwear", "Sporty"],
     Season: ["Summer", "Winter", "Spring", "Fall"],
     Fit: ["Slim", "Loose", "Regular", "Tight", "Oversized"],
-    Favorite: ["Favorited"], // ✅ Already included
+    "Other filters": ["Favorited"], // ✅ Already included
   };
   
   export const COLLECTION_FILTERS = {
     Occasion: ["Casual", "Work", "Formal", "Travel"],
     Season: ["Spring", "Summer", "Fall", "Winter"],
-    Favorite: ["Favorited"], // ✅ Add if collections will support favoriting
+    "Other filters": ["Favorited"], // ✅ Already included
   };
   
   export const OUTFIT_FILTERS = {
     Season: ["Spring", "Summer", "Fall", "Winter"],
     Style: ["Sporty", "Comfy", "Chic"],
-    Favorite: ["Favorited"], // ✅ Add this
+    "Other filters": ["Favorited"], // ✅ Already included
   };
   

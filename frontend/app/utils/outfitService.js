@@ -1,5 +1,13 @@
 import { db } from "./firebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 
 // Function to create an outfit
 export const addOutfit = async (
@@ -24,7 +32,7 @@ export const addOutfit = async (
       season: Array.isArray(season) ? season : [season],
       style: Array.isArray(style) ? style : [style],
       fit: Array.isArray(fit) ? fit : [fit],
-      imageUrl,
+      imageUrl, // UPDATE LATER FOR COMBINED IMAGE?
       isPublic,
       favorite: false,
       createdAt: new Date(),
@@ -32,6 +40,48 @@ export const addOutfit = async (
     return docRef.id;
   } catch (error) {
     console.error("Error adding outfit:", error);
+  }
+};
+
+export const getFilteredOutfits = async (userId, selectedFilters) => {
+  try {
+    const q = query(
+      collection(db, "outfits"),
+      where("userId", "==", userId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    const allOutfits = [];
+    querySnapshot.forEach((doc) => {
+      allOutfits.push({ id: doc.id, ...doc.data() });
+    });
+
+    if (selectedFilters.length === 0) return allOutfits;
+
+    // ✅ Handle "Favorited" as a filter
+    const isFilteringFavorites = selectedFilters.includes("Favorited");
+    const tagFilters = selectedFilters.filter((f) => f !== "Favorited");
+
+    const filtered = allOutfits.filter((outfit) => {
+      const tags = [
+        ...(outfit.category || []),
+        ...(outfit.season || []),
+        ...(outfit.style || []),
+        ...(outfit.fit || []),
+      ];
+
+      const matchesTags = tagFilters.every((filter) => tags.includes(filter));
+      const matchesFavorite = isFilteringFavorites
+        ? outfit.favorite === true
+        : true;
+
+      return matchesTags && matchesFavorite;
+    });
+
+    return filtered;
+  } catch (error) {
+    console.error("Error fetching filtered outfits:", error);
+    return [];
   }
 };
 

@@ -16,7 +16,6 @@ import { useCallback } from "react";
 
 const ClosetScreen = () => {
   const router = useRouter();
-
   const [userId, setUserId] = useState(null);
   const [clothingData, setClothingData] = useState([]);
   const [favoritedIds, setFavoritedIds] = useState([]);
@@ -98,14 +97,6 @@ const ClosetScreen = () => {
     }, [userId])
   );
 
-  if (isLoading) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading your closet...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <Header
@@ -116,13 +107,20 @@ const ClosetScreen = () => {
         filters={CLOTHING_FILTERS}
         onFilterChange={handleFilterChange}
       />
-      <GridLayout
-        data={clothingData}
-        numColumns={2}
-        isFavorited={isFavorited}
-        toggleFavorite={toggleFavorite}
-        onItemPress={(item) => router.push(`/closet/${item.id}`)}
-      />
+
+      {isLoading ? (
+        <View style={styles.container}>
+          <Text>Loading your closet...</Text>
+        </View>
+      ) : (
+        <GridLayout
+          data={clothingData}
+          numColumns={2}
+          isFavorited={isFavorited}
+          toggleFavorite={toggleFavorite}
+          onItemPress={(item) => router.push(`/closet/${item.id}`)}
+        />
+      )}
     </View>
   );
 };
