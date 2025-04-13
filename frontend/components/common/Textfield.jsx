@@ -1,5 +1,5 @@
 import React from "react";
-import { TextInput, StyleSheet, View, TouchableWithoutFeedback } from "react-native";
+import { TextInput, StyleSheet, View } from "react-native";
 import theme from "../../styles/theme";
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   input: {
+    flex:1,
     paddingVertical: theme.spacing.large,
     paddingHorizontal: theme.spacing.large,
     fontSize: 18,

@@ -20,6 +20,7 @@ export const CLOTHING_FILTERS = {
   export const OUTFIT_FILTERS = {
     Season: ["Spring", "Summer", "Fall", "Winter"],
     Style: ["Sporty", "Comfy", "Chic"],
+    Fit: ["Slim", "Loose", "Regular", "Tight", "Oversized"],
     "Other filters": ["Favorited"], // ✅ Already included
   };
   

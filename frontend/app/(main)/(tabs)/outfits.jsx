@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Button, TouchableOpacity, Text } from "react-native";
 import GridLayout from "../../../components/organization/GridLayout";
-import { router, useRouter, useLocalSearchParams } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import theme from "@/styles/theme";
 import { useFocusEffect } from "@react-navigation/native";
 import FilterBar from "@/components/common/FilterBar";
-import { CLOTHING_FILTERS } from "@/constants/filterPresets";
+import { OUTFIT_FILTERS } from "@/constants/filterPresets";
 import {
   getFilteredOutfits,
   updateOutfitFavoriteStatus,
@@ -127,7 +127,7 @@ const OutfitScreen = () => {
       )}
 
       <FilterBar
-        filters={CLOTHING_FILTERS}
+        filters={OUTFIT_FILTERS}
         onFilterChange={handleFilterChange}
       />
 
@@ -155,7 +155,7 @@ const OutfitScreen = () => {
                 </Text>
               </TouchableOpacity>
             </View>
-          )}{" "}
+          )}
         </View>
       )}
     </View>
@@ -167,6 +167,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     padding: 16,
+    paddingBottom: 0,
   },
   nextButtonContainer: {
     alignItems: "center",

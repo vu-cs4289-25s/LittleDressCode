@@ -96,26 +96,39 @@ const AccordionView = ({ sections, selectedButtons, onSelectButton }) => {
     }
   };
 
-  const renderHeader = (section, index, isActive) => (
-    <TouchableOpacity
-      style={[styles.header, !isActive && styles.headerBorder]}
-      onPress={() => {
-        Keyboard.dismiss();
-        handleUpdateSections(isActive ? [] : [index]);
-      }}
-      activeOpacity={1}
-    >
-      <View style={styles.headerContent}>
-        <View style={styles.iconStyle}>{getIconForSection(section.title)}</View>
-        <Text style={styles.headerText}>{section.title}</Text>
-      </View>
-      <MaterialIcons
-        name={isActive ? "keyboard-arrow-up" : "keyboard-arrow-down"}
-        size={24}
-        color="#666"
-      />
-    </TouchableOpacity>
-  );
+  const renderHeader = (section, index, isActive) => {
+    const selected = selectedButtons[section.id] || [];
+    const selectedText = selected.length > 0 ? selected.join(", ") : null;
+  
+    return (
+      <TouchableOpacity
+        style={[styles.header, !isActive && styles.headerBorder]}
+        onPress={() => {
+          Keyboard.dismiss();
+          handleUpdateSections(isActive ? [] : [index]);
+        }}
+        activeOpacity={1}
+      >
+        <View style={styles.headerContent}>
+          <View style={styles.iconStyle}>{getIconForSection(section.title)}</View>
+          <Text style={styles.headerText}>{section.title}</Text>
+        </View>
+        <View style={styles.headerRight}>
+          {selectedText && !isActive && (
+            <Text style={styles.selectedSummary} numberOfLines={1}>
+              {selectedText}
+            </Text>
+          )}
+          <MaterialIcons
+            name={isActive ? "keyboard-arrow-up" : "keyboard-arrow-down"}
+            size={24}
+            color="#666"
+          />
+        </View>
+      </TouchableOpacity>
+    );
+  };
+  
 
   const renderContent = (section, _, isActive) => {
     const allButtons = [...section.buttons];
@@ -168,7 +181,7 @@ const AccordionView = ({ sections, selectedButtons, onSelectButton }) => {
                 {addingTag ? (
                   <ActivityIndicator size="small" color="white" />
                 ) : (
-                  <MaterialIcons name="check" size={10} color="white" />
+                  <MaterialIcons name="check" size={20} color="white" />
                 )}
               </TouchableOpacity>
             </View>
@@ -180,7 +193,7 @@ const AccordionView = ({ sections, selectedButtons, onSelectButton }) => {
             >
               <MaterialIcons
                 name="add"
-                size={20}
+                size={12}
                 color={theme.colors.text.dark}
               />
             </TouchableOpacity>
@@ -272,8 +285,8 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: theme.colors.buttonBackground.light,
-    width: 28,
-    height: 28,
+    width: 30,
+    height: 30,
     paddingHorizontal: 0,
   },
   confirmButton: {
@@ -294,6 +307,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     minWidth: 120,
     color: theme.colors.text.dark,
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    maxWidth: "50%",
+  },
+  
+  selectedSummary: {
+    color: "#007AFF",
+    fontSize: 14,
+    maxWidth: 120,
+    overflow: "hidden",
   },
 });
 
