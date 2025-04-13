@@ -15,6 +15,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import theme from "../styles/theme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import TextButton from "./common/TextButton";
 
 // Enable LayoutAnimation for smooth transitions on Android
 if (
@@ -56,7 +57,9 @@ const AccordionView = ({
       case "Style":
         return <MaterialIcons name="style" color="#E1289B" size={20} />;
       case "Fit":
-        return <FontAwesome5 name="ruler-vertical" color="#096B91" size={18} />;
+        return <MaterialIcons name="accessibility" color="#096B91" size={20} />;
+      case "Other filters":
+        return <MaterialIcons name="cloud" color="#CCCCCC" size={20} />;
       default:
         return null;
     }
@@ -94,20 +97,15 @@ const AccordionView = ({
           );
 
           return (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.accordionButton,
-                isSelected ? styles.selectedButton : styles.unselectedButton,
-              ]}
-              onPress={() => onSelectButton(section.id, button.label)}
-            >
-              <Text
-                style={isSelected ? styles.selectedText : styles.deselectedText}
-              >
-                {button.label}
-              </Text>
-            </TouchableOpacity>
+            <View key={index}>
+              <TextButton
+                title={button.label}
+                size="small"
+                color={isSelected ? "dark" : "light"}
+                onPress={() => onSelectButton(section.id, button.label)}
+                sty
+              />
+            </View>
           );
         })}
       </View>
@@ -144,9 +142,7 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
-    gap: 5,
-    marginBottom: 10,
+    gap: 10,
   },
   iconStyle: {
     width: 25,
@@ -155,7 +151,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
+    padding: 15,
     paddingLeft: 0,
     paddingRight: 0,
     backgroundColor: theme.colors.backgrounds.primary,
@@ -170,6 +166,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 10,
+    paddingTop: 0,
     backgroundColor: theme.colors.backgrounds.primary,
   },
   buttonContainer: {

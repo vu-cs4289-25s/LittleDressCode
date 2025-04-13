@@ -11,7 +11,8 @@ const GridLayout = ({
   isFavorited = () => false,
   toggleFavorite = () => {},
   renderItem: customRenderItem = null,
-  onItemPress = null, // ✅ new prop
+  onItemPress = null, 
+  isOutfit = false // If it is an outfit being displayed, 3+ images so styling is different
 }) => {
   return (
     <FlatList
@@ -24,7 +25,7 @@ const GridLayout = ({
         ) : (
           <View style={styles.gridItem}>
             <ItemContainer
-              clothingItem={item.imageUrl || item.image}
+              clothingItem={isOutfit ? (item): (item.imageUrl || item.image)}
               isFavorited={isFavorited(item.id)}
               toggleFavorite={() => toggleFavorite(item.id)}
               isSelectable={isSelectable}
@@ -33,6 +34,7 @@ const GridLayout = ({
                 () =>
                   isSelectable ? toggleSelect(item.id) : onItemPress?.(item) // ✅ trigger press if not selecting
               }
+              isOutfit={isOutfit}
             />
           </View>
         );

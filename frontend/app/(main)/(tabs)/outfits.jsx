@@ -1,71 +1,94 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Button, TouchableOpacity, Text } from "react-native";
 import GridLayout from "../../../components/organization/GridLayout";
 import { router, useRouter, useLocalSearchParams } from "expo-router";
 import theme from "@/styles/theme";
+import { useFocusEffect } from "@react-navigation/native";
 import FilterBar from "@/components/common/FilterBar";
-// Dummy outfit images
+import { CLOTHING_FILTERS } from "@/constants/filterPresets";
+import {
+  getFilteredOutfits,
+  updateOutfitFavoriteStatus,
+} from "@/app/utils/outfitService";
 import Header from "@/components/headers/Header";
-import dummy1 from "../../../assets/images/dummy/outfits/img-1.png";
-import dummy2 from "../../../assets/images/dummy/outfits/img-2.png";
-import dummy3 from "../../../assets/images/dummy/outfits/img-3.png";
-import dummy4 from "../../../assets/images/dummy/outfits/img-4.png";
-import dummy5 from "../../../assets/images/dummy/outfits/img-5.png";
-import dummy6 from "../../../assets/images/dummy/outfits/img-6.png";
-import BackHeader from "@/components/headers/BackHeader";
-
-const dummyStartData = [dummy1, dummy2, dummy3, dummy4, dummy5, dummy6];
+import { useCallback } from "react";
+import { auth } from "@/app/utils/firebaseConfig";
 
 const OutfitScreen = () => {
   const { mode } = useLocalSearchParams();
-  const router = useRouter(); // Get the router object from expo-router
   const isSelectionMode = mode === "select";
+  const router = useRouter();
 
-  const handleFilterChange = async (filters) => {
-    console.log("🔍 handleFilterChange triggered with:", filters);
+  const [userId, setUserId] = useState(null);
+  const [outfitData, setOutfitData] = useState([]);
+  const [favoritedIds, setFavoritedIds] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const isFavorited = (id) => favoritedIds.includes(id);
+
+  const toggleFavorite = async (id) => {
+    if (!id || typeof id !== "string") {
+      console.error("🚨 Invalid ID passed to toggleFavorite:", id);
+      return;
+    }
+    const isNowFavorite = !isFavorited(id);
+    setFavoritedIds((prev) =>
+      isNowFavorite ? [...prev, id] : prev.filter((fid) => fid !== id)
+    );
 
     try {
-      console.log("📞 About to call getFilteredClothingItems");
-      const filtered = await getFilteredClothingItems(userId, filters);
+      await updateOutfitFavoriteStatus(id, isNowFavorite);
+      console.log(`💖 Favorite updated: ${id} -> ${isNowFavorite}`);
+    } catch (err) {
+      console.error("❌ Failed to update outfit favorite status:", err);
+    }
+  };
+
+  const handleFilterChange = async (filters) => {
+    if (!userId) return;
+
+    console.log("🔍 Outfit filters applied:", filters);
+    try {
+      const filtered = await getFilteredOutfits(userId, filters);
+
+      const favorited = filtered
+        .filter((item) => item.favorite)
+        .map((item) => item.id);
+
+      setFavoritedIds(favorited);
 
       const firebaseData = filtered.map((item, index) => ({
         id: item.id || `firebase-${index}`,
         name: item.name,
         image: { uri: item.imageUrl },
+        clothingItems: item.clothingItems,
       }));
 
-      if (filters.length === 0) {
-        const combined = [
-          ...dummyStartData.map((img, i) => ({
-            id: i + 1,
-            name: `[dummy ${i + 1}]`,
-            image: img,
-          })),
-          ...firebaseData,
-        ];
-        setClothingData(combined);
-        console.log(
-          "🧺 Items on screen (no filters):",
-          combined.map((item) => item.name)
-        );
-      } else {
-        console.log("🧪 Entered filtered branch");
-        setClothingData(firebaseData);
-        console.log(
-          "🎯 Items on screen (filtered):",
-          firebaseData.map((item) => item.name)
-        );
-      }
+      setOutfitData(firebaseData);
     } catch (err) {
-      console.error("❌ Error in handleFilterChange:", err);
+      console.error("❌ Error filtering outfits:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const [clothingData, setClothingData] = useState(
-    dummyStartData.map((image, index) => ({
-      id: index + 1,
-      image: image,
-    }))
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        console.log("🚫 No user logged in.");
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (userId) {
+        handleFilterChange([]);
+      }
+    }, [userId])
   );
 
   const [selectedIds, setSelectedIds] = useState([]);
@@ -103,25 +126,36 @@ const OutfitScreen = () => {
         />
       )}
 
-      <FilterBar onFilterChange={handleFilterChange} />
-
-      <GridLayout
-        data={clothingData}
-        numColumns={2}
-        isSelectable={isSelectionMode}
-        selectedIds={selectedIds}
-        toggleSelect={toggleSelect}
-        isFavorited={(id) => false} // Replace with real logic later
-        toggleFavorite={() => {}} // Optional for now
+      <FilterBar
+        filters={CLOTHING_FILTERS}
+        onFilterChange={handleFilterChange}
       />
 
-      {isSelectionMode && selectedIds.length > 0 && (
-        <View style={styles.nextButtonContainer}>
-          <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-            <Text style={styles.nextButtonText}>
-              Next ({selectedIds.length})
-            </Text>
-          </TouchableOpacity>
+      {isLoading ? (
+        <View style={styles.container}>
+          <Text>Loading your outfits...</Text>
+        </View>
+      ) : (
+        <View>
+          <GridLayout
+            data={outfitData}
+            numColumns={2}
+            isSelectable={isSelectionMode}
+            selectedIds={selectedIds}
+            toggleSelect={toggleSelect}
+            isFavorited={isFavorited}
+            toggleFavorite={toggleFavorite}
+            isOutfit={true}
+          />
+          {isSelectionMode && selectedIds.length > 0 && (
+            <View style={styles.nextButtonContainer}>
+              <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+                <Text style={styles.nextButtonText}>
+                  Next ({selectedIds.length})
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}{" "}
         </View>
       )}
     </View>

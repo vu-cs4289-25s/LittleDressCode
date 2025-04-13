@@ -178,6 +178,7 @@ const AddItem = () => {
           onPress={saveClothingItem}
         />
       </View>
+
     </View>
   );
 };

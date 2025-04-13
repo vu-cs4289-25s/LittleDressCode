@@ -18,20 +18,33 @@ const ItemContainer = ({
   onSelect = () => {},
   showControls = true,
   isSolo, // if rendering ItemContainer by itself, not in GridLayout
+  size = 180,
+  isOutfit = false, // If it is an outfit being displayed, 3+ images so styling is different
 }) => {
   const [imageSource, setImageSource] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (clothingItem) {
-      setImageSource(clothingItem);
+      if (isOutfit && Array.isArray(clothingItem.clothingItems)) {
+        const urls = clothingItem.clothingItems.map((item) => item.imageUrl);
+        setImageSource(urls); // Now imageSource is just an array of URLs
+      } else {
+        setImageSource(clothingItem); // For single image
+      }
+      setLoading(false);
     }
-    setLoading(false);
   }, [clothingItem]);
 
   return (
     <Pressable onPress={onSelect}>
-      <View style={[isSolo ? styles.boxSolo : styles.box]}>
+      <View
+        style={[
+          isSolo
+            ? { ...styles.boxSolo, width: size, height: size }
+            : styles.box,
+        ]}
+      >
         {/* Top-right icon */}
         {showControls && (
           <View style={styles.iconContainer}>
@@ -65,6 +78,20 @@ const ItemContainer = ({
 
         {loading ? (
           <ActivityIndicator size="large" color="#000" />
+        ) : isOutfit && Array.isArray(imageSource) ? (
+          <View style={styles.outfitCircle}>
+            {imageSource.map((src, index) => {
+              console.log(src);
+              return (
+                <Image
+                  key={index}
+                  source={{ uri: src }}
+                  style={[styles.outfitImage, outfitImagePositions[index]]}
+                  resizeMode="cover"
+                />
+              );
+            })}
+          </View>
         ) : (
           <Image
             source={imageSource}
@@ -90,8 +117,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   boxSolo: {
-    width: 180,
-    height: 180,
     paddingHorizontal: 17,
     paddingVertical: 16,
     justifyContent: "center",
@@ -111,6 +136,24 @@ const styles = StyleSheet.create({
     height: "75%",
     borderRadius: 10,
   },
+  outfitImage: {
+    width: 60,
+    height: 60,
+    position: "absolute",
+    borderColor: "#fff",
+  },
 });
+
+const outfitImagePositions = [
+  { top: 0, left: "50%", transform: [{ translateX: -30 }] },
+  { top: "50%", left: 0, transform: [{ translateY: -30 }] },
+  { top: "50%", right: 0, transform: [{ translateY: -30 }] },
+  { bottom: 0, left: "50%", transform: [{ translateX: -30 }] },
+  {
+    top: "50%",
+    left: "50%",
+    transform: [{ translateX: -30 }, { translateY: -30 }],
+  },
+];
 
 export default ItemContainer;

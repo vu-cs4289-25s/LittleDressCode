@@ -1,5 +1,5 @@
 import React from "react";
-import { TextInput, StyleSheet, View, Text } from "react-native";
+import { TextInput, StyleSheet, View, TouchableWithoutFeedback } from "react-native";
 import theme from "../../styles/theme";
 import { MaterialIcons } from "@expo/vector-icons";
 

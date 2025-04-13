@@ -36,27 +36,46 @@ const DraggableItem = ({ image, id, position, onSavePosition }) => {
   );
 };
 
-const OutfitRow = ({ title, data }) => (
+const OutfitRow = ({
+  title,
+  data,
+  category,
+  toggleSelectMixAndMatch,
+  selectedItems,
+}) => (
   <View style={styles.rowContainer}>
     <Text style={styles.title}>{title}</Text>
     <FlatList
       data={data}
       horizontal
-      showsHorizontalScrollIndicator={false}
-      keyExtractor={(item, index) => item.id || index.toString()}
+      keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
-        <Image
-          source={{ uri: item.imageUrl }}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        <TouchableOpacity
+          style={{ marginRight: 12 }}
+          onPress={() => toggleSelectMixAndMatch(item, category)}
+        >
+          <ItemContainer
+            clothingItem={{ uri: item.imageUrl }}
+            selectedIds={selectedItems.map((i) => i.id)}
+            isSelectable={true}
+            isSelected={selectedItems.some(
+              (selectedItem) =>
+                selectedItem.id === item.id &&
+                selectedItem.category === category
+            )}
+            onSelect={() => toggleSelectMixAndMatch(item, category)}
+            isSolo={true}
+            size={150}
+          />
+        </TouchableOpacity>
       )}
+      showsHorizontalScrollIndicator={false}
     />
   </View>
 );
 
 const NewOutfit = () => {
-  const [selectedTab, setSelectedTab] = useState("Canvas");
+  const [selectedTab, setSelectedTab] = useState("Mix & Match");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -64,7 +83,7 @@ const NewOutfit = () => {
   const [tops, setTops] = useState([]);
   const [bottoms, setBottoms] = useState([]);
   const [shoes, setShoes] = useState([]);
-  const router = useRouter(); // Get the router object from expo-router
+  const router = useRouter(); 
 
   useEffect(() => {
     const fetchClothingItems = async () => {
@@ -105,6 +124,7 @@ const NewOutfit = () => {
     ]);
   };
 
+  // For Canvas
   const toggleSelect = (item) => {
     setSelectedIds((prev) =>
       prev.includes(item.id)
@@ -119,6 +139,32 @@ const NewOutfit = () => {
     } else {
       addToCanvas(item);
     }
+  };
+
+  // For Mix&Match
+  const toggleSelectMixAndMatch = (item, category) => {
+    const isAlreadySelected = selectedItems.some(
+      (selectedItem) =>
+        selectedItem.id === item.id && selectedItem.category === category
+    );
+
+    if (isAlreadySelected) {
+      setSelectedItems((prevItems) =>
+        prevItems.filter(
+          (selectedItem) =>
+            !(selectedItem.id === item.id && selectedItem.category === category)
+        )
+      );
+    } else {
+      setSelectedItems([...selectedItems, { ...item, category }]);
+    }
+  };
+
+  const selectItem = (category, item) => {
+    setSelectedItems((prev) => ({
+      ...prev,
+      [category]: item,
+    }));
   };
 
   const savePosition = (id, x, y, rotation) => {
@@ -161,7 +207,7 @@ const NewOutfit = () => {
         {selectedTab === "Canvas" && (
           <>
             <View style={styles.canvas}>
-              {selectedItems.map((item, index) => (
+              {/* {selectedItems.map((item, index) => (
                 <DraggableItem
                   key={index}
                   id={item.id}
@@ -169,7 +215,7 @@ const NewOutfit = () => {
                   position={item.position}
                   onSavePosition={savePosition}
                 />
-              ))}
+              ))} */}
             </View>
 
             <View style={styles.container}>
@@ -226,9 +272,27 @@ const NewOutfit = () => {
         {selectedTab === "Mix & Match" && (
           <View style={styles.container}>
             <ScrollView>
-              <OutfitRow title="Tops" data={tops} />
-              <OutfitRow title="Bottoms" data={bottoms} />
-              <OutfitRow title="Shoes" data={shoes} />
+              <OutfitRow
+                title="Tops"
+                data={tops}
+                category="Tops"
+                toggleSelectMixAndMatch={toggleSelectMixAndMatch}
+                selectedItems={selectedItems}
+              />
+              <OutfitRow
+                title="Bottoms"
+                data={bottoms}
+                category="Bottoms"
+                toggleSelectMixAndMatch={toggleSelectMixAndMatch}
+                selectedItems={selectedItems}
+              />
+              <OutfitRow
+                title="Shoes"
+                data={shoes}
+                category="Shoes"
+                toggleSelectMixAndMatch={toggleSelectMixAndMatch}
+                selectedItems={selectedItems}
+              />
             </ScrollView>
           </View>
         )}
@@ -239,7 +303,10 @@ const NewOutfit = () => {
             size="large"
             color="dark"
             onPress={() => {
-              router.push("outfits/OutfitCompletion"); // Correct placement of router.push inside the function
+              router.push({
+                pathname: "outfits/OutfitCompletion",
+                params: { selectedItems: JSON.stringify(selectedItems) },
+              });
             }}
           />
         </View>
@@ -251,7 +318,7 @@ const NewOutfit = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
-    padding: 16,
+    paddingTop: 32,
     gap: 20,
   },
   containerButton: {
@@ -266,6 +333,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingBottom: 80,
     position: "relative",
+    
   },
   canvas: {
     flex: 1,
@@ -301,12 +369,14 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
   },
   rowContainer: {
+    flexDirection: "column",
     marginBottom: 16,
   },
   title: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 8,
+    paddingLeft: 32
   },
   image: {
     width: 100,
