@@ -1,11 +1,13 @@
 import React from 'react';
 import { TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { deleteDoc, doc } from 'firebase/firestore';
+import { db } from '@/app/utils/firebaseConfig';
 import theme from '../../styles/theme';
 
 const DeleteButton = ({ 
   itemId, 
-  collectionName = "clothingItems",
+  collection, // ✅ Required and must be passed in
   onSuccess,
   onError,
   size = 24,
@@ -27,13 +29,16 @@ const DeleteButton = ({
           style: "destructive",
           onPress: async () => {
             try {
-              const { deleteDoc, doc } = await import('firebase/firestore');
-              const { db } = await import('@/app/utils/firebaseConfig');
-              await deleteDoc(doc(db, collectionName, itemId));
+              if (!itemId || !collection) {
+                throw new Error("Item ID or collection is missing");
+              }
+              
+              await deleteDoc(doc(db, collection, itemId));
               onSuccess?.();
             } catch (error) {
               console.error("Delete failed:", error);
               onError?.(error);
+              Alert.alert("Error", "Failed to delete item. Please try again.");
             }
           }
         }
@@ -63,8 +68,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: theme.colors.backgrounds.secondary,
   },
-  icon: {
-  }
+  icon: {}
 });
 
 export default DeleteButton;

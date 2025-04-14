@@ -17,7 +17,7 @@ import { useAuthRequest } from "expo-auth-session/providers/google"; // ✅ Only
 WebBrowser.maybeCompleteAuthSession();
 
 // ✅ Replace with your actual Firebase Web Client ID
-const CLIENT_ID = "1064620928715-omm1gtruk21rsga1tp8c1e0emnncbtfs.apps.googleusercontent.com";
+const CLIENT_ID =process.env.EXPO_PUBLIC_WEB_CLIENT_ID;
 
 // 🔹 Email/Password Login
 export const signIn = async (email, password) => {
