@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Button, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text, ActivityIndicator } from "react-native";
 import GridLayout from "../../../components/organization/GridLayout";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import theme from "@/styles/theme";
@@ -23,11 +23,17 @@ const OutfitScreen = () => {
   const [outfitData, setOutfitData] = useState([]);
   const [favoritedIds, setFavoritedIds] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    setIsReady(true);
+  }, []);
+
   const isFavorited = (id) => favoritedIds.includes(id);
 
   const toggleFavorite = async (id) => {
     if (!id || typeof id !== "string") {
-      console.error("🚨 Invalid ID passed to toggleFavorite:", id);
+      console.error("Invalid ID passed to toggleFavorite:", id);
       return;
     }
     const isNowFavorite = !isFavorited(id);
@@ -37,35 +43,29 @@ const OutfitScreen = () => {
 
     try {
       await updateOutfitFavoriteStatus(id, isNowFavorite);
-      console.log(`💖 Favorite updated: ${id} -> ${isNowFavorite}`);
     } catch (err) {
-      console.error("❌ Failed to update outfit favorite status:", err);
+      console.error("Failed to update outfit favorite status:", err);
     }
   };
 
   const handleFilterChange = async (filters) => {
     if (!userId) return;
 
-    console.log("🔍 Outfit filters applied:", filters);
     try {
       const filtered = await getFilteredOutfits(userId, filters);
-
       const favorited = filtered
         .filter((item) => item.favorite)
         .map((item) => item.id);
 
       setFavoritedIds(favorited);
-
-      const firebaseData = filtered.map((item, index) => ({
-        id: item.id || `firebase-${index}`,
+      setOutfitData(filtered.map((item) => ({
+        id: String(item.id), // Ensure ID is string
         name: item.name,
         image: { uri: item.imageUrl },
         clothingItems: item.clothingItems,
-      }));
-
-      setOutfitData(firebaseData);
+      })));
     } catch (err) {
-      console.error("❌ Error filtering outfits:", err);
+      console.error("Error filtering outfits:", err);
     } finally {
       setIsLoading(false);
     }
@@ -75,20 +75,17 @@ const OutfitScreen = () => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setUserId(user.uid);
-      } else {
-        console.log("🚫 No user logged in.");
       }
     });
-
     return unsubscribe;
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      if (userId) {
+      if (userId && isReady) {
         handleFilterChange([]);
       }
-    }, [userId])
+    }, [userId, isReady])
   );
 
   const [selectedIds, setSelectedIds] = useState([]);
@@ -99,12 +96,8 @@ const OutfitScreen = () => {
     );
   };
 
-  const handleSearch = () => {
-    // Add search logic here if needed
-  };
-
   const handleNewOutfit = () => {
-    router.push("outfits/NewOutfit"); // Correct placement of router.push inside the function
+    router.push("outfits/NewOutfit");
   };
 
   const handleNext = () => {
@@ -114,15 +107,26 @@ const OutfitScreen = () => {
     });
   };
 
+  const handleOutfitPress = (item) => {
+    if (!isSelectionMode) {
+      router.push({
+        pathname: "/outfits/[id]",
+        params: { 
+          id: String(item.id), // Explicit string conversion
+          mode: "view"
+        }
+      });
+    }
+  };
+
   return (
     <View style={styles.container}>
       {isSelectionMode ? (
-        <BackHeader title={"Create a Collection"} backTo={"/collections"} />
+        <Header title={"Create a Collection"} backTo={"/collections"} />
       ) : (
         <Header
           title={"My Outfits"}
           onPress={handleNewOutfit}
-          handleTextChange={handleSearch}
         />
       )}
 
@@ -132,11 +136,12 @@ const OutfitScreen = () => {
       />
 
       {isLoading ? (
-        <View style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" />
           <Text>Loading your outfits...</Text>
         </View>
       ) : (
-        <View>
+        <View style={styles.gridContainer}>
           <GridLayout
             data={outfitData}
             numColumns={2}
@@ -146,15 +151,14 @@ const OutfitScreen = () => {
             isFavorited={isFavorited}
             toggleFavorite={toggleFavorite}
             isOutfit={true}
+            onItemPress={handleOutfitPress}
           />
           {isSelectionMode && selectedIds.length > 0 && (
-            <View style={styles.nextButtonContainer}>
-              <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-                <Text style={styles.nextButtonText}>
-                  Next ({selectedIds.length})
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+              <Text style={styles.nextButtonText}>
+                Next ({selectedIds.length})
+              </Text>
+            </TouchableOpacity>
           )}
         </View>
       )}
@@ -167,21 +171,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     padding: 16,
-    paddingBottom: 0,
   },
-  nextButtonContainer: {
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: 16,
+  },
+  gridContainer: {
+    flex: 1,
   },
   nextButton: {
     backgroundColor: theme.colors.buttonBackground.dark,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 10,
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    margin: 16,
   },
   nextButtonText: {
     color: "white",
-    fontSize: 16,
     fontWeight: "bold",
   },
 });

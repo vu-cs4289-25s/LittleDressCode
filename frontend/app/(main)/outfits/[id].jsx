@@ -8,6 +8,7 @@ import {
   Alert,
   SafeAreaView,
   ScrollView,
+  FlatList,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -18,52 +19,22 @@ import TextButton from "@/components/common/TextButton";
 import TextField from "@/components/common/Textfield";
 import DeleteButton from "@/components/common/DeleteIcon";
 
-const ClosetDetail = () => {
-  const { id } = useLocalSearchParams();
+const OutfitDetail = () => {
+  const params = useLocalSearchParams();
+  const id = typeof params.id === "string" ? params.id : params.id?.[0];
   const router = useRouter();
 
-  const [itemData, setItemData] = useState(null);
+  const [outfitData, setOutfitData] = useState(null);
   const [name, setName] = useState("");
   const [selectedButtons, setSelectedButtons] = useState({});
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [clothingItems, setClothingItems] = useState([]);
+  const [error, setError] = useState(null);
   const detailRef = useRef();
 
   useEffect(() => {
     setSections([
-      {
-        id: 1,
-        title: "Category",
-        buttons: [
-          { label: "Tops" },
-          { label: "Pants" },
-          { label: "Skirts" },
-          { label: "Dresses" },
-          { label: "Bags" },
-          { label: "Shoes" },
-          { label: "Outerwear" },
-          { label: "Jewelry" },
-          { label: "Hats" },
-        ],
-      },
-      {
-        id: 2,
-        title: "Color",
-        buttons: [
-          { label: "Red" },
-          { label: "Blue" },
-          { label: "Black" },
-          { label: "White" },
-          { label: "Green" },
-          { label: "Yellow" },
-          { label: "Pink" },
-          { label: "Gray" },
-          { label: "Brown" },
-          { label: "Purple" },
-          { label: "Orange" },
-          { label: "Multicolor" },
-        ],
-      },
       {
         id: 3,
         title: "Style",
@@ -100,42 +71,59 @@ const ClosetDetail = () => {
   }, []);
 
   useEffect(() => {
-    const fetchItem = async () => {
+    const fetchOutfit = async () => {
       try {
-        const docRef = doc(db, "clothingItems", id);
+        if (!id || typeof id !== "string") {
+          setError("No valid outfit ID provided");
+          setLoading(false);
+          return;
+        }
+
+        const docRef = doc(db, "outfits", id);
         const snapshot = await getDoc(docRef);
 
         if (snapshot.exists()) {
           const data = snapshot.data();
-          setItemData(data);
+          setOutfitData(data);
           setName(data.name || "");
           setSelectedButtons({
-            1: data.category || [],
-            2: data.color || [],
             3: data.style || [],
             4: data.season || [],
             5: data.fit || [],
           });
+
+          if (data.clothingItems) {
+            setClothingItems(
+              Array.isArray(data.clothingItems)
+                ? data.clothingItems
+                : [data.clothingItems]
+            );
+          }
         } else {
-          console.warn("No clothing item found with id:", id);
+          console.warn("No outfit found with id:", id);
+          setError("Outfit not found");
         }
       } catch (err) {
-        console.error("Error fetching clothing item:", err);
+        console.error("Error fetching outfit:", err);
+        setError("Failed to load outfit");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchItem();
+    fetchOutfit();
   }, [id]);
 
   const handleSave = async () => {
     try {
-      const docRef = doc(db, "clothingItems", id);
+      if (!id) {
+        Alert.alert("Error", "No outfit ID available");
+        return;
+      }
+
+      const docRef = doc(db, "outfits", id);
       await updateDoc(docRef, {
         name,
-        category: selectedButtons[1] || [],
-        color: selectedButtons[2] || [],
         style: selectedButtons[3] || [],
         season: selectedButtons[4] || [],
         fit: selectedButtons[5] || [],
@@ -145,15 +133,29 @@ const ClosetDetail = () => {
       router.back();
     } catch (err) {
       console.error("Error saving updates:", err);
-      Alert.alert("Error", "Failed to update clothing item.");
+      Alert.alert("Error", "Failed to update outfit.");
     }
   };
 
-  if (loading || !itemData) {
+  if (loading) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" />
-        <Text>Loading clothing item...</Text>
+        <Text>Loading outfit...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>{error}</Text>
+        <TextButton
+          title="Go Back"
+          size="large"
+          color="dark"
+          onPress={() => router.back()}
+        />
       </View>
     );
   }
@@ -163,57 +165,68 @@ const ClosetDetail = () => {
       <View style={styles.header}>
         <DeleteButton
           itemId={id}
-          collection="clothingItems"
+          collection="outfits"
           onSuccess={() => {
-            Alert.alert("Item Deleted");
-            router.back();
+            Alert.alert("Outfit Deleted");
+            router.replace("/outfits");
           }}
           color="black"
           size={26}
           buttonStyle={styles.deleteButton}
         />
-        <ShareButton type="closet" id={id} refToCapture={detailRef} />
+        <ShareButton type="outfit" id={id} refToCapture={detailRef} />
       </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <View ref={detailRef} style={styles.content}>
-          <Image
-            source={{ uri: itemData.imageUrl }}
-            style={styles.image}
-            resizeMode="contain"
-          />
-          <View style={styles.nameInputContainer}>
-            {itemData?.name ? (
-              <Text style={styles.inputLabel}>{itemData.name}</Text>
-            ) : (
-              <Text style={styles.inputLabel}>Item Name</Text>
-            )}
+        <View ref={detailRef}>
+          {/* Outfit images horizontal scroll */}
+          <View style={styles.imageScrollContainer}>
+            <FlatList
+              horizontal
+              data={clothingItems}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.imageWrapper}>
+                  <Image
+                    source={{ uri: item.imageUrl }}
+                    style={styles.outfitImage}
+                    resizeMode="cover"
+                  />
+                </View>
+              )}
+              contentContainerStyle={styles.horizontalScrollContent}
+              showsHorizontalScrollIndicator={false}
+            />
+          </View>
+
+          <View style={styles.formContainer}>
+            <Text style={styles.inputLabel}>{outfitData.name}</Text>
             <TextField
               size="large"
               onChangeText={setName}
               value={name}
-              placeholder="Edit item name"
+              placeholder="Edit outfit name"
             />
-          </View>
 
-          <View style={styles.accordionContainer}>
-            <AccordionViewEdit
-              sections={sections}
-              initialTags={selectedButtons}
-              onTagChange={setSelectedButtons}
-            />
-          </View>
+            <View style={styles.accordionContainer}>
+              <AccordionViewEdit
+                sections={sections}
+                initialTags={selectedButtons}
+                onTagChange={setSelectedButtons}
+              />
+            </View>
 
-          <View style={styles.buttonWrapper}>
-            <TextButton
-              title="Save Changes"
-              size="large"
-              color="dark"
-              onPress={handleSave}
-            />
+            <View style={styles.buttonWrapper}>
+              <TextButton
+                title="Save Changes"
+                size="large"
+                color="dark"
+                onPress={handleSave}
+              />
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -234,27 +247,29 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 16,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  content: {
-    width: "100%",
-    alignItems: "center",
-  },
   scrollContent: {
-    paddingBottom: 100,
-    paddingHorizontal: 16,
+    paddingBottom: 40,
   },
-  image: {
-    width: "100%",
-    height: 200,
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-  nameInputContainer: {
-    width: "100%",
+  imageScrollContainer: {
+    height: 160,
     marginBottom: 20,
+  },
+  horizontalScrollContent: {
+    paddingLeft: 16,
+    alignItems: 'center',
+  },
+  imageWrapper: {
+    width: 140,
+    height: 140,
+    marginRight: 12,
+  },
+  outfitImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
+  formContainer: {
+    paddingHorizontal: 16,
   },
   inputLabel: {
     fontSize: 16,
@@ -264,12 +279,22 @@ const styles = StyleSheet.create({
   },
   accordionContainer: {
     width: "100%",
+    marginTop: 16,
   },
   buttonWrapper: {
     width: "100%",
     marginTop: 30,
-    marginBottom: 20,
+    marginBottom: 30,
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
+    textAlign: "center",
+    marginVertical: 20,
+  },
+  deleteButton: {
+    padding: 8,
   },
 });
 
-export default ClosetDetail;
+export default OutfitDetail;
