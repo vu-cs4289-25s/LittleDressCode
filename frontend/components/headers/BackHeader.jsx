@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   title: {
-    fontSize: 25,
+    fontSize: 22,
     fontWeight: "600",
     paddingLeft: 4,
   },

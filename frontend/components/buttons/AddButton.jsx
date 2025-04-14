@@ -13,8 +13,8 @@ const AddButton = ({ onPress }) => {
 
 const styles = StyleSheet.create({
   button: {
-    width: 37,
-    height: 37,
+    width: 34,
+    height: 34,
     borderRadius: 25,
     backgroundColor: theme.colors.buttonBackground.dark,
     alignItems: "center",
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: theme.colors.backgrounds.primary,
-    fontSize: 28,
+    fontSize: 24,
   },
 });
 

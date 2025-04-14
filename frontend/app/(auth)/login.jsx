@@ -15,7 +15,6 @@ import TextField from "@/components/common/Textfield.jsx";
 import TextButton from "@/components/common/TextButton.jsx";
 import KeyboardDismissWrapper from "@/components/util/KeyboardWrapper.jsx";
 
-
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -65,23 +64,10 @@ export default function LoginPage() {
               style={styles.logo}
             />
           </View>
-          <Text style={styles.title}>Let's get started</Text>
+          <Text style={styles.title}>Login to your account</Text>
         </View>
 
         <View style={styles.inputContainer}>
-          <TextButton
-            title="Sign in with Google"
-            size="large"
-            color="light"
-            onPress={handleGoogleSignIn}
-            disabled={!request}
-            img={require("../../assets/icons/google.webp")} 
-          />
-          <View style={styles.orSeparator}>
-            <View style={styles.separatorLine} />
-            <Text style={styles.orText}>OR</Text>
-            <View style={styles.separatorLine} />
-          </View>
           <View style={styles.inputFields}>
             <TextField
               placeholder="Email"
@@ -101,7 +87,21 @@ export default function LoginPage() {
             color="dark"
             onPress={handleLogin}
           />
+          <View style={styles.orSeparator}>
+            <View style={styles.separatorLine} />
+            <Text style={styles.orText}>OR</Text>
+            <View style={styles.separatorLine} />
+          </View>
+          <TextButton
+            title="Sign in with Google"
+            size="large"
+            color="light"
+            onPress={handleGoogleSignIn}
+            disabled={!request}
+            img={require("../../assets/icons/google.webp")}
+          />
         </View>
+
         <View style={styles.registerLine}>
           <Text>Don’t have an account yet? </Text>
           <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
@@ -122,25 +122,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   loginHeader: {
-    marginBottom: 20,
+    marginBottom: 10,
   },
   logoContainer: {
     alignItems: "center",
-    marginBottom: theme.spacing.large,
+    marginBottom: 40,
   },
   logo: {
     height: 80,
-    width: 80,
-    borderRadius: theme.borderRadius.default,
+    width: 210,
     backgroundColor: theme.colors.neutral.gray, // Placeholder color for logo
     justifyContent: "center",
     alignItems: "center",
   },
   title: {
-    fontSize: theme.fonts.size.large,
+    fontSize: 20,
     fontWeight: "bold",
     color: theme.colors.text.dark, // More contrast for better readability
-    marginBottom: theme.spacing.large,
+    marginBottom: theme.spacing.small,
   },
   orSeparator: {
     flexDirection: "row",
@@ -173,6 +172,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   registerLine: {
+    marginTop: 20,
     flexDirection: "row",
     alignItems: "center",
   },
