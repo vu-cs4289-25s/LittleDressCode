@@ -1,71 +1,95 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, ScrollView, Button } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
+import React, { useState, useEffect, useCallback } from "react";
+import { View, StyleSheet, ScrollView, Button, Text } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { auth, db } from "@/app/utils/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 
 import Header from "@/components/headers/Header";
 import ItemContainer from "@/components/organization/ItemContainer";
 import TextField from "@/components/common/Textfield";
 import AccordionView from "@/components/AccordionView";
-import { auth, db } from "@/app/utils/firebaseConfig";
 import { addCollection } from "@/app/utils/collectionsService";
+import { useFocusEffect } from "@react-navigation/native";
+
+const sections = [
+  {
+    id: "occasion",
+    title: "Occasion",
+    buttons: [
+      { label: "Casual" },
+      { label: "Work" },
+      { label: "Formal" },
+      { label: "Travel" },
+    ],
+  },
+  {
+    id: "season",
+    title: "Season",
+    buttons: [
+      { label: "Spring" },
+      { label: "Summer" },
+      { label: "Fall" },
+      { label: "Winter" },
+    ],
+  },
+];
 
 const NewCollection = () => {
   const { selected } = useLocalSearchParams();
   const selectedIds = JSON.parse(selected || "[]");
+  const router = useRouter();
 
+  const [userId, setUserId] = useState(null);
   const [outfits, setOutfits] = useState([]);
   const [name, setName] = useState("");
   const [selectedButtons, setSelectedButtons] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Auth listener
   useEffect(() => {
-    const fetchOutfits = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "outfits"));
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        const selectedOutfits = data.filter((item) =>
-          selectedIds.includes(item.id)
-        );
-        setOutfits(selectedOutfits);
-      } catch (error) {
-        console.error("Error fetching outfits:", error);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log("Authenticated user:", user.uid);
+        setUserId(user.uid);
+      } else {
+        console.warn("No user logged in.");
       }
-    };
+    });
+    return unsubscribe;
+  }, []);
 
-    fetchOutfits();
-  }, [selectedIds]);
+  // Fetch selected outfits
+  const fetchSelectedOutfits = async () => {
+    console.log("Fetching selected outfits for IDs:", selectedIds);
+    try {
+      const snapshot = await getDocs(collection(db, "outfits"));
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-  const sections = [
-    {
-      id: "occasion",
-      title: "Occasion",
-      buttons: [
-        { label: "Casual" },
-        { label: "Work" },
-        { label: "Formal" },
-        { label: "Travel" },
-      ],
-    },
-    {
-      id: "season",
-      title: "Season",
-      buttons: [
-        { label: "Spring" },
-        { label: "Summer" },
-        { label: "Fall" },
-        { label: "Winter" },
-      ],
-    },
-  ];
+      const filtered = data.filter((item) => selectedIds.includes(item.id));
+      console.log("Filtered outfits:", filtered);
+      setOutfits(filtered);
+    } catch (err) {
+      console.error("Error fetching outfits:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (userId && selectedIds.length > 0) {
+        fetchSelectedOutfits();
+      }
+    }, [userId])
+  );
 
   const onSelectButton = (sectionId, buttonLabel) => {
     setSelectedButtons((prev) => {
       const current = prev[sectionId] || [];
       const alreadySelected = current.includes(buttonLabel);
-
       return {
         ...prev,
         [sectionId]: alreadySelected
@@ -76,9 +100,8 @@ const NewCollection = () => {
   };
 
   const handleSave = async () => {
-    const userId = auth.currentUser?.uid;
     if (!userId || !name.trim()) {
-      console.warn("Missing user or name");
+      console.warn("⚠️ Missing user or collection name");
       return;
     }
 
@@ -87,6 +110,12 @@ const NewCollection = () => {
       ...(selectedButtons["season"] || []),
       ...(selectedButtons["occasion"] || []),
     ];
+
+    console.log("Saving new collection with:");
+    console.log("User ID:", userId);
+    console.log("Name:", name.trim());
+    console.log("Outfit IDs:", outfitIds);
+    console.log("Tags:", tags);
 
     try {
       const docId = await addCollection(
@@ -97,10 +126,13 @@ const NewCollection = () => {
         tags,
         true
       );
-      console.log("Saved collection ID:", docId);
-      router.push("/collections");
-    } catch (error) {
-      console.error("Error saving collection:", error);
+
+      console.log("Collection created with ID:", docId);
+
+      // Navigate and refresh collections page
+      router.replace("/");
+    } catch (err) {
+      console.error("Error saving collection:", err);
     }
   };
 
@@ -118,25 +150,30 @@ const NewCollection = () => {
         contentContainerStyle={styles.bodyContent}
         keyboardShouldPersistTaps="handled"
       >
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {outfits.map((item) => (
-            <View key={item.id} style={styles.itemWrapper}>
-              <ItemContainer
-                clothingItem={{ uri: item.imageUrl }}
-                isFavorited={false}
-                toggleFavorite={() => {}}
-                isSelectable={false}
-                isSelected={false}
-                showControls={false}
-              />
-            </View>
-          ))}
-        </ScrollView>
+        {isLoading ? (
+          <Text>Loading selected outfits...</Text>
+        ) : (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+          >
+            {outfits.map((item) => (
+              <View key={item.id} style={styles.itemWrapper}>
+                <ItemContainer
+                  clothingItem={item}
+                  isFavorited={false}
+                  toggleFavorite={() => {}}
+                  isSelectable={false}
+                  isSelected={false}
+                  showControls={false}
+                  isOutfit={true}
+                />
+              </View>
+            ))}
+          </ScrollView>
+        )}
 
         <View style={styles.inputWrapper}>
           <TextField
@@ -170,7 +207,6 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    gap: 12,
   },
   scroll: {
     marginBottom: 0,

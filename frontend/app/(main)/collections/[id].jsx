@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Button, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Button,
+  Text,
+  TouchableOpacity,
+  Image,
+} from "react-native";
+
 import { useLocalSearchParams, router } from "expo-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/utils/firebaseConfig";
@@ -136,11 +144,15 @@ const ViewCollectionScreen = () => {
               onPress={() => handleOutfitPress(item.id)}
               style={[
                 styles.outfitCard,
-                isEditing && !selectedOutfits.includes(item.id) && styles.inactiveCard,
+                isEditing &&
+                  !selectedOutfits.includes(item.id) &&
+                  styles.inactiveCard,
               ]}
             >
               <Image
-                source={{ uri: item.imageUrl || "https://via.placeholder.com/150" }}
+                source={{
+                  uri: item.imageUrl || "https://via.placeholder.com/150",
+                }}
                 style={styles.image}
               />
             </TouchableOpacity>
