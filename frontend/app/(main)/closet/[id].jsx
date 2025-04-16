@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 300,
+    height: 200,
     borderRadius: 10,
     marginBottom: 16,
     backgroundColor: theme.colors.backgrounds.secondary,

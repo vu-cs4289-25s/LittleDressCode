@@ -195,7 +195,6 @@ const CollectionScreen = () => {
                         isSelected={false}
                         showControls={false}
                         isOutfit={true}
-                        size={150}
                       />
                     </View>
                   )}
@@ -217,7 +216,7 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   collectionSection: {
-    padding: 16,
+    paddingTop: 16,
   },
   collectionHeader: {
     flexDirection: "row",
