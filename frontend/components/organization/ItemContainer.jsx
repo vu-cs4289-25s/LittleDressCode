@@ -28,6 +28,7 @@ const ItemContainer = ({
     if (clothingItem) {
       if (isOutfit && Array.isArray(clothingItem.clothingItems)) {
         const urls = clothingItem.clothingItems.map((item) => item.imageUrl);
+        console.log(urls);
         setImageSource(urls);
       } else {
         setImageSource(clothingItem);
@@ -40,9 +41,9 @@ const ItemContainer = ({
     <Pressable onPress={onSelect}>
       <View
         style={[
-          isSolo
-            ? { ...styles.boxSolo, width: size, height: size }
-            : styles.box,
+          styles.box,
+          { width: size, height: size },
+          isSolo && styles.boxSolo,
         ]}
       >
         {/* Top-right icon */}
