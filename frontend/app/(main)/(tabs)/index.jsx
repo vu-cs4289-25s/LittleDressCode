@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -21,7 +21,7 @@ import Header from "@/components/headers/Header";
 import FilterBar from "@/components/common/FilterBar";
 import theme from "@/styles/theme";
 import { COLLECTION_FILTERS } from "@/constants/filterPresets";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import ItemContainer from "@/components/organization/ItemContainer";
 
@@ -51,7 +51,7 @@ const CollectionScreen = () => {
     try {
       const docRef = doc(db, "collections", id);
       await updateDoc(docRef, { favorite: isNowFavorite });
-      console.log(` Updated favorite: ${id} → ${isNowFavorite}`);
+      console.log(`Updated favorite: ${id} → ${isNowFavorite}`);
     } catch (err) {
       console.error("Failed to update favorite:", err);
     }
@@ -76,7 +76,7 @@ const CollectionScreen = () => {
     setCollections(filtered);
   };
 
-  // ✅ Wait for user login state before fetching collections
+  // Wait for user login state before fetching collections
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
@@ -89,53 +89,55 @@ const CollectionScreen = () => {
     return unsubscribe;
   }, []);
 
-  useEffect(() => {
-    if (!user) return;
+  useFocusEffect(
+    useCallback(() => {
+      if (!user) return;
 
-    const fetchCollections = async () => {
-      try {
-        setLoading(true);
-        const snapshot = await getDocs(collection(db, "collections"));
-        const data = await Promise.all(
-          snapshot.docs.map(async (docSnap) => {
-            const rawData = docSnap.data();
-            const outfitIds = Array.isArray(rawData.outfits)
-              ? rawData.outfits
-              : [];
+      const fetchCollections = async () => {
+        try {
+          setLoading(true);
+          const snapshot = await getDocs(collection(db, "collections"));
+          const data = await Promise.all(
+            snapshot.docs.map(async (docSnap) => {
+              const rawData = docSnap.data();
+              const outfitIds = Array.isArray(rawData.outfits)
+                ? rawData.outfits
+                : [];
 
-            const outfits = await Promise.all(
-              outfitIds.map(async (outfitId) => {
-                const outfitSnap = await getDoc(doc(db, "outfits", outfitId));
-                return outfitSnap.exists()
-                  ? { id: outfitId, ...outfitSnap.data() }
-                  : null;
-              })
-            );
+              const outfits = await Promise.all(
+                outfitIds.map(async (outfitId) => {
+                  const outfitSnap = await getDoc(doc(db, "outfits", outfitId));
+                  return outfitSnap.exists()
+                    ? { id: outfitId, ...outfitSnap.data() }
+                    : null;
+                })
+              );
 
-            return {
-              id: docSnap.id,
-              ...rawData,
-              outfits: outfits.filter(Boolean),
-            };
-          })
-        );
+              return {
+                id: docSnap.id,
+                ...rawData,
+                outfits: outfits.filter(Boolean),
+              };
+            })
+          );
 
-        const favorited = data
-          .filter((col) => col.favorite === true)
-          .map((col) => col.id);
+          const favorited = data
+            .filter((col) => col.favorite === true)
+            .map((col) => col.id);
 
-        setAllCollections(data);
-        setCollections(data);
-        setFavoritedIds(favorited);
-      } catch (error) {
-        console.error("Error fetching collections:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+          setAllCollections(data);
+          setCollections(data);
+          setFavoritedIds(favorited);
+        } catch (error) {
+          console.error("Error fetching collections:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchCollections();
-  }, [user]);
+      fetchCollections();
+    }, [user])
+  );
 
   return (
     <View style={styles.container}>
