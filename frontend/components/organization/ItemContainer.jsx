@@ -80,17 +80,31 @@ const ItemContainer = ({
           <ActivityIndicator size="large" color="#000" />
         ) : isOutfit && Array.isArray(imageSource) ? (
           <View style={styles.outfitRow}>
-            {imageSource.map((src, index) => (
-              <Image
-                key={index}
-                source={{ uri: src }}
-                style={[
-                  styles.outfitImageRow,
-                  { marginLeft: index === 0 ? 0 : -20 }, 
-                ]}
-                resizeMode="cover"
-              />
-            ))}
+            {imageSource.map((src, index) => {
+              const totalImages = imageSource.length;
+              const overlapRatio = 0.15; // how much each image overlaps with the previous one
+              const effectiveWidth = size * (1 - overlapRatio); // amount of space taken up per image
+              const totalWidth =
+                size - (totalImages - 1) * effectiveWidth * overlapRatio; // actual available width
+              const imageWidth = totalWidth / totalImages;
+
+              return (
+                <Image
+                  key={index}
+                  source={{ uri: src }}
+                  style={[
+                    styles.outfitImageRow,
+                    {
+                      width: imageWidth,
+                      height: imageWidth,
+                      marginLeft: index === 0 ? 0 : -imageWidth * overlapRatio,
+                      zIndex: totalImages - index,
+                    },
+                  ]}
+                  resizeMode="cover"
+                />
+              );
+            })}
           </View>
         ) : (
           <Image
@@ -148,8 +162,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   outfitImageRow: {
-    width: 60,
-    height: 60,
   },
 });
 

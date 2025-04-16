@@ -17,6 +17,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import theme from "../styles/theme";
+import TextButton from "./common/TextButton";
 
 if (
   Platform.OS === "android" &&
@@ -91,7 +92,13 @@ const AccordionViewEdit = ({ sections, initialTags = {}, onTagChange }) => {
       case "Season":
         return <MaterialIcons name="sunny" size={20} color="#261BAC" />;
       case "Occasion":
-        return <MaterialCommunityIcons name="party-popper" size={20} color="#FF9F0A" />;
+        return (
+          <MaterialCommunityIcons
+            name="party-popper"
+            size={20}
+            color="#FF9F0A"
+          />
+        );
       case "Category":
         return <FontAwesome6 name="shirt" size={18} color="#734230" />;
       case "Color":
@@ -105,26 +112,39 @@ const AccordionViewEdit = ({ sections, initialTags = {}, onTagChange }) => {
     }
   };
 
-  const renderHeader = (section, index, isActive) => (
-    <TouchableOpacity
-      style={[styles.header, !isActive && styles.headerBorder]}
-      onPress={() => {
-        Keyboard.dismiss();
-        handleUpdateSections(isActive ? [] : [index]);
-      }}
-      activeOpacity={1}
-    >
-      <View style={styles.headerContent}>
-        <View style={styles.iconStyle}>{getIconForSection(section.title)}</View>
-        <Text style={styles.headerText}>{section.title}</Text>
-      </View>
-      <MaterialIcons
-        name={isActive ? "keyboard-arrow-up" : "keyboard-arrow-down"}
-        size={24}
-        color="#666"
-      />
-    </TouchableOpacity>
-  );
+  const renderHeader = (section, index, isActive) => {
+    const selected = selectedTags[section.id] || [];
+    const selectedText = selected.length > 0 ? selected.join(", ") : null;
+  
+    return (
+      <TouchableOpacity
+        style={[styles.header, !isActive && styles.headerBorder]}
+        onPress={() => {
+          Keyboard.dismiss();
+          handleUpdateSections(isActive ? [] : [index]);
+        }}
+        activeOpacity={1}
+      >
+        <View style={styles.headerContent}>
+          <View style={styles.iconStyle}>{getIconForSection(section.title)}</View>
+          <Text style={styles.headerText}>{section.title}</Text>
+        </View>
+        <View style={styles.headerRight}>
+          {selectedText && !isActive && (
+            <Text style={styles.selectedSummary} numberOfLines={1}>
+              {selectedText}
+            </Text>
+          )}
+          <MaterialIcons
+            name={isActive ? "keyboard-arrow-up" : "keyboard-arrow-down"}
+            size={24}
+            color="#666"
+          />
+        </View>
+      </TouchableOpacity>
+    );
+  };
+  
 
   const renderContent = (section, _, isActive) => {
     const existing = selectedTags[section.id] || [];
@@ -142,19 +162,15 @@ const AccordionViewEdit = ({ sections, initialTags = {}, onTagChange }) => {
           {allButtons.map((button, index) => {
             const isSelected = existing.includes(button.label);
             return (
-              <TouchableOpacity
-                key={`${section.id}-${button.label}-${index}`}
-                style={[
-                  styles.accordionButton,
-                  isSelected ? styles.selectedButton : styles.unselectedButton,
-                ]}
-                onPress={() => handleSelectButton(section.id, button.label)}
-                disabled={addingTag}
-              >
-                <Text style={isSelected ? styles.selectedText : styles.deselectedText}>
-                  {button.label}
-                </Text>
-              </TouchableOpacity>
+              <View key={index}>
+                <TextButton
+                  title={button.label}
+                  size="small"
+                  color={isSelected ? "dark" : "light"}
+                  onPress={() => handleSelectButton(section.id, button.label)}
+                />
+              </View>
+              
             );
           })}
 
@@ -163,7 +179,9 @@ const AccordionViewEdit = ({ sections, initialTags = {}, onTagChange }) => {
               <TextInput
                 style={styles.customInput}
                 value={customInputs[section.id] || ""}
-                onChangeText={(text) => handleCustomInputChange(section.id, text)}
+                onChangeText={(text) =>
+                  handleCustomInputChange(section.id, text)
+                }
                 placeholder="Enter custom tag"
                 autoFocus
                 editable={!addingTag}
@@ -186,7 +204,11 @@ const AccordionViewEdit = ({ sections, initialTags = {}, onTagChange }) => {
               onPress={() => toggleAddInput(section.id)}
               disabled={addingTag}
             >
-              <MaterialIcons name="add" size={20} color={theme.colors.text.dark} />
+              <MaterialIcons
+                name="add"
+                size={12}
+                color={theme.colors.text.dark}
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -217,7 +239,7 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    gap: 10,
   },
   iconStyle: {
     width: 25,
@@ -226,7 +248,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
+    padding: 15,
     paddingLeft: 0,
     paddingRight: 0,
     backgroundColor: theme.colors.backgrounds.primary,
@@ -241,6 +263,8 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 10,
+    paddingTop: 0,
+    backgroundColor: theme.colors.backgrounds.primary,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -255,6 +279,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+    minWidth: 20,
+    maxWidth: "auto",
     alignSelf: "flex-start",
     marginRight: 8,
   },
@@ -272,12 +298,16 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: theme.colors.buttonBackground.light,
-    width: 40,
+    width: 30,
+    height: 30,
     paddingHorizontal: 0,
   },
   confirmButton: {
     backgroundColor: theme.colors.buttonBackground.dark,
+    borderRadius: 100,
+    alignContent: "cemter",
     marginLeft: 8,
+    justifyContent: "cennter",
   },
   customInputContainer: {
     flexDirection: "row",
@@ -291,8 +321,18 @@ const styles = StyleSheet.create({
     minWidth: 120,
     color: theme.colors.text.dark,
   },
-  sectionContainer: {
-    marginBottom: 10,
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    maxWidth: "50%",
+  },
+
+  selectedSummary: {
+    color: "#007AFF",
+    fontSize: 14,
+    maxWidth: 120,
+    overflow: "hidden",
   },
 });
 

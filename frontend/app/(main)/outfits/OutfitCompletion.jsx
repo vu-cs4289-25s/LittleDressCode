@@ -16,6 +16,7 @@ import { addOutfit } from "../../utils/outfitService";
 import { auth } from "@/app/utils/firebaseConfig";
 import ArrangeItems from "./ArrangeItems";
 import TextField from "@/components/common/Textfield";
+import theme from "@/styles/theme";
 
 const OutfitCompletion = () => {
   const { selectedItems } = useLocalSearchParams();
@@ -80,7 +81,7 @@ const OutfitCompletion = () => {
 
   const saveOutfit = async () => {
     const userId = auth.currentUser?.uid;
-    const images= parsedItems.map((item) => item.imageUrl);
+    const images = parsedItems.map((item) => item.imageUrl);
 
     const outfitData = {
       userId,
@@ -90,13 +91,13 @@ const OutfitCompletion = () => {
       season: selectedButtons[4] || [],
       style: selectedButtons[3] || [],
       fit: selectedButtons[5] || [],
-    //   imageUrl: generatedImageUri || parsedItems[0]?.imageUrl || null,
-    imageUrl: images[0], //temp
+      //   imageUrl: generatedImageUri || parsedItems[0]?.imageUrl || null,
+      imageUrl: images[0], //temp
       isPublic: false,
     };
 
     console.log("outfit");
-    console.log(outfitData)
+    console.log(outfitData);
     console.log(outfitData.imageUrl);
     try {
       await addOutfit(
@@ -120,31 +121,30 @@ const OutfitCompletion = () => {
   };
 
   return (
-    <View style={styles.bigContainer}>
-      <View style={styles.container}>
-        <StyleHeader title={"New Outfit"} />
-        <View style={styles.selectedImagesContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {parsedItems && parsedItems.length > 0 ? (
-              parsedItems.map((item, index) => (
-                //change styling later
-                <Image
-                  key={item.id || index}
-                  source={{ uri: item.imageUrl }}
-                  style={{
-                    width: 150,
-                    height: 150,
-                    marginRight: 10,
-                    borderRadius: 10,
-                    backgroundColor: "#eee",
-                  }}
-                />
-              ))
-            ) : (
-              <Text>No items selected</Text>
-            )}
-          </ScrollView>
-        </View>
+    <View style={styles.container}>
+      <StyleHeader title={"New Outfit"} />
+      <View style={styles.outfitRow}>
+        {parsedItems.map((src, index) => {
+          const total = parsedItems.length;
+          const imageSize = total <= 3 ? 150 : total <= 5 ? 120 : 90;
+          const overlap = total <= 3 ? -20 : total <= 5 ? -30 : -40;
+
+          return (
+            <Image
+              key={index}
+              source={{ uri: src.imageUrl }}
+              style={{
+                width: imageSize,
+                height: imageSize,
+                marginLeft: index === 0 ? 0 : overlap,
+                zIndex: total - index,
+              }}
+              resizeMode="cover"
+            />
+          );
+        })}
+      </View>
+      <View style={styles.containerMain}>
         <Text style={{ marginBottom: 6, fontWeight: "bold" }}>Item Name</Text>
         <TextField
           placeholder="Enter outfit name"
@@ -163,30 +163,20 @@ const OutfitCompletion = () => {
       </View>
       <View style={styles.containerButton}>
         <TextButton
-          title="Next"
+          title="Save Outfit"
           size="large"
           color="dark"
           onPress={saveOutfit}
         />
       </View>
-
-      {/* <ArrangeItems
-        imageUrls={parsedItems.map((item) => item.imageUrl)}
-        onCombined={(uri) => {
-          console.log("Combined image:", uri);
-          // Do something with it, like upload or save
-        }}
-      /> */}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  bigContainer: {
+  container: {
     flex: 1,
     backgroundColor: "white",
-    paddingBottom: 80,
-    position: "relative",
   },
   containerButton: {
     padding: 16,
@@ -195,14 +185,25 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  container: {
-    backgroundColor: "white",
-    padding: 16,
-    gap: 20,
-    height: 900,
-  },
   accordianWrapper: {
     height: "100%",
+  },
+  outfitRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: 250,
+    marginBottom: 16,
+    paddingVertical: 40,
+    backgroundColor: theme.colors.backgrounds.secondary,
+  },
+  outfitImageRow: {
+    width: 150,
+    height: 150,
+  },
+  containerMain: {
+    paddingHorizontal: theme.padding.normal,
   },
 });
 

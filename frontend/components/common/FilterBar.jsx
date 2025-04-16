@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import Modal from "../common/Modal";
 import theme from "../../styles/theme";
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AccordionView from "../AccordionView";
 
@@ -125,7 +125,7 @@ const FilterBar = ({ filters = {}, onFilterChange }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flexDirection: "row", alignItems: "center", paddingLeft: 16 },
+  container: { flexDirection: "row", paddingTop: 10, alignItems: "center" },
   filterIcon: {
     width: 30,
     height: 30,

@@ -64,9 +64,6 @@ const DeleteButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: theme.colors.backgrounds.secondary,
   },
   icon: {}
 });
