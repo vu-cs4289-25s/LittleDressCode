@@ -13,6 +13,7 @@ import {
 import Header from "@/components/headers/Header";
 import { useCallback } from "react";
 import { auth } from "@/app/utils/firebaseConfig";
+import TextButton from "@/components/common/TextButton";
 
 const OutfitScreen = () => {
   const { mode } = useLocalSearchParams();
@@ -154,11 +155,13 @@ const OutfitScreen = () => {
             onItemPress={handleOutfitPress}
           />
           {isSelectionMode && selectedIds.length > 0 && (
-            <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-              <Text style={styles.nextButtonText}>
-                Next ({selectedIds.length})
-              </Text>
-            </TouchableOpacity>
+             <TextButton
+             title={`Next (${selectedIds.length})`}
+             size="large"
+             color="dark"
+             onPress={handleNext}
+           />
+           
           )}
         </View>
       )}

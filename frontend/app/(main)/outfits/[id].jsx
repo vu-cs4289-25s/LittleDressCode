@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   imageScrollContainer: {
-    height: 300,
+    height: 200,
     marginBottom: 20,
     backgroundColor: theme.colors.backgrounds.secondary,
   },

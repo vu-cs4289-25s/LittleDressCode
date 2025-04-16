@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, Button, Text } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { auth, db } from "@/app/utils/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
-
+import theme from "@/styles/theme";
 import Header from "@/components/headers/Header";
 import ItemContainer from "@/components/organization/ItemContainer";
 import TextField from "@/components/common/Textfield";
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    paddingHorizontal: 16,
+    paddingHorizontal: theme.padding.normal,
   },
   body: {
     flex: 1,
