@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   grid: {
-    paddingHorizontal: 16,
     paddingTop: 16,
   },
   gridItem: {

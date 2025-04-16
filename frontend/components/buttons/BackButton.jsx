@@ -6,7 +6,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 const AddButton = ({ onPress }) => {
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
-      <MaterialIcons name="arrow-back" style={styles.text} />
+      <MaterialIcons name="arrow-back-ios-new" style={styles.text} />
     </TouchableOpacity>
   );
 };
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: theme.colors.backgrounds.primary,
-    fontSize: 24,
+    fontSize: 18,
   },
 });
 

@@ -169,8 +169,9 @@ const OutfitScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
-    padding: 16,
+    backgroundColor: theme.colors.backgrounds.primary,
+    paddingHorizontal: theme.padding.normal,
+    paddingBottom: 0,
   },
   loadingContainer: {
     flex: 1,

@@ -13,6 +13,7 @@ import {
 import { auth } from "@/app/utils/firebaseConfig";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import theme from "@/styles/theme";
 
 const ClosetScreen = () => {
   const router = useRouter();
@@ -128,8 +129,8 @@ const ClosetScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
-    padding: 16,
+    backgroundColor: theme.colors.backgrounds.primary,
+    paddingHorizontal: theme.padding.normal,
     paddingBottom: 0,
   },
 });

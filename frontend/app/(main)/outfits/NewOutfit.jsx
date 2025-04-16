@@ -20,7 +20,8 @@ import { useRouter } from "expo-router";
 
 // Categories & Tabs
 const categories = ["All", "Tops", "Pants", "Shoes", "Jackets"];
-const tabs = ["Mix & Match", "Canvas"];
+const tabs = ["Mix & Match"];
+// const tabs = ["Mix & Match", "Canvas"];
 
 const DraggableItem = ({ image, id, position, onSavePosition }) => {
   const handleStop = (e, data) => {
@@ -83,7 +84,7 @@ const NewOutfit = () => {
   const [tops, setTops] = useState([]);
   const [bottoms, setBottoms] = useState([]);
   const [shoes, setShoes] = useState([]);
-  const router = useRouter(); 
+  const router = useRouter();
 
   useEffect(() => {
     const fetchClothingItems = async () => {
@@ -176,38 +177,37 @@ const NewOutfit = () => {
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={styles.bigContainer}>
-        <View style={styles.container}>
-          <StyleHeader title={"Styling"} />
-        </View>
+    <View style={styles.bigContainer}>
+      <View style={styles.container}>
+        <StyleHeader title={"Styling"} />
+      </View>
 
-        <View style={styles.tabHeader}>
-          {tabs.map((tab) => (
-            <TouchableOpacity
-              key={tab}
-              onPress={() => setSelectedTab(tab)}
+      <View style={styles.tabHeader}>
+        {tabs.map((tab) => (
+          <TouchableOpacity
+            key={tab}
+            onPress={() => setSelectedTab(tab)}
+            style={[
+              styles.tabButton,
+              selectedTab === tab && styles.tabButtonActive,
+            ]}
+          >
+            <Text
               style={[
-                styles.tabButton,
-                selectedTab === tab && styles.tabButtonActive,
+                styles.tabText,
+                selectedTab === tab && styles.tabTextActive,
               ]}
             >
-              <Text
-                style={[
-                  styles.tabText,
-                  selectedTab === tab && styles.tabTextActive,
-                ]}
-              >
-                {tab}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+              {tab}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-        {selectedTab === "Canvas" && (
-          <>
-            <View style={styles.canvas}>
-              {/* {selectedItems.map((item, index) => (
+      {selectedTab === "Canvas" && (
+        <>
+          <View style={styles.canvas}>
+            {/* {selectedItems.map((item, index) => (
                 <DraggableItem
                   key={index}
                   id={item.id}
@@ -216,110 +216,108 @@ const NewOutfit = () => {
                   onSavePosition={savePosition}
                 />
               ))} */}
-            </View>
-
-            <View style={styles.container}>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.categoryBar}
-              >
-                {categories.map((cat) => (
-                  <TouchableOpacity
-                    key={cat}
-                    onPress={() => setSelectedCategory(cat)}
-                    style={{ marginRight: 12 }}
-                  >
-                    <TextButton
-                      title={cat}
-                      size="small"
-                      color="light"
-                      onPress={() => setSelectedCategory(cat)}
-                    />
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-
-              <FlatList
-                data={clothingData.filter(
-                  (item) =>
-                    selectedCategory === "All" ||
-                    item.category === selectedCategory
-                )}
-                horizontal
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={{ marginRight: 12 }}
-                    onPress={() => addToCanvas(item)}
-                  >
-                    <ItemContainer
-                      clothingItem={{ uri: item.imageUrl }}
-                      selectedIds={selectedIds}
-                      isSelectable={true}
-                      isSelected={selectedIds.includes(item.id)}
-                      onSelect={() => toggleSelect(item)}
-                      isSolo={true}
-                    />
-                  </TouchableOpacity>
-                )}
-                showsHorizontalScrollIndicator={false}
-              />
-            </View>
-          </>
-        )}
-
-        {selectedTab === "Mix & Match" && (
-          <View style={styles.container}>
-            <ScrollView>
-              <OutfitRow
-                title="Tops"
-                data={tops}
-                category="Tops"
-                toggleSelectMixAndMatch={toggleSelectMixAndMatch}
-                selectedItems={selectedItems}
-              />
-              <OutfitRow
-                title="Bottoms"
-                data={bottoms}
-                category="Bottoms"
-                toggleSelectMixAndMatch={toggleSelectMixAndMatch}
-                selectedItems={selectedItems}
-              />
-              <OutfitRow
-                title="Shoes"
-                data={shoes}
-                category="Shoes"
-                toggleSelectMixAndMatch={toggleSelectMixAndMatch}
-                selectedItems={selectedItems}
-              />
-            </ScrollView>
           </View>
-        )}
 
-        <View style={styles.containerButton}>
-          <TextButton
-            title="Next"
-            size="large"
-            color="dark"
-            onPress={() => {
-              router.push({
-                pathname: "outfits/OutfitCompletion",
-                params: { selectedItems: JSON.stringify(selectedItems) },
-              });
-            }}
-          />
+          <View style={styles.container}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.categoryBar}
+            >
+              {categories.map((cat) => (
+                <TouchableOpacity
+                  key={cat}
+                  onPress={() => setSelectedCategory(cat)}
+                  style={{ marginRight: 12 }}
+                >
+                  <TextButton
+                    title={cat}
+                    size="small"
+                    color="light"
+                    onPress={() => setSelectedCategory(cat)}
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <FlatList
+              data={clothingData.filter(
+                (item) =>
+                  selectedCategory === "All" ||
+                  item.category === selectedCategory
+              )}
+              horizontal
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={{ marginRight: 12 }}
+                  onPress={() => addToCanvas(item)}
+                >
+                  <ItemContainer
+                    clothingItem={{ uri: item.imageUrl }}
+                    selectedIds={selectedIds}
+                    isSelectable={true}
+                    isSelected={selectedIds.includes(item.id)}
+                    onSelect={() => toggleSelect(item)}
+                    isSolo={true}
+                  />
+                </TouchableOpacity>
+              )}
+              showsHorizontalScrollIndicator={false}
+            />
+          </View>
+        </>
+      )}
+
+      {selectedTab === "Mix & Match" && (
+        <View style={styles.container}>
+          <ScrollView>
+            <OutfitRow
+              title="Tops"
+              data={tops}
+              category="Tops"
+              toggleSelectMixAndMatch={toggleSelectMixAndMatch}
+              selectedItems={selectedItems}
+            />
+            <OutfitRow
+              title="Bottoms"
+              data={bottoms}
+              category="Bottoms"
+              toggleSelectMixAndMatch={toggleSelectMixAndMatch}
+              selectedItems={selectedItems}
+            />
+            <OutfitRow
+              title="Shoes"
+              data={shoes}
+              category="Shoes"
+              toggleSelectMixAndMatch={toggleSelectMixAndMatch}
+              selectedItems={selectedItems}
+            />
+          </ScrollView>
         </View>
+      )}
+
+      <View style={styles.containerButton}>
+        <TextButton
+          title="Next"
+          size="large"
+          color="dark"
+          onPress={() => {
+            router.push({
+              pathname: "outfits/OutfitCompletion",
+              params: { selectedItems: JSON.stringify(selectedItems) },
+            });
+          }}
+        />
       </View>
-    </GestureHandlerRootView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
-    paddingTop: 32,
-    gap: 20,
+    marginBottom: 10,
   },
   containerButton: {
     padding: 16,
@@ -331,9 +329,6 @@ const styles = StyleSheet.create({
   bigContainer: {
     flex: 1,
     backgroundColor: "white",
-    paddingBottom: 80,
-    position: "relative",
-    
   },
   canvas: {
     flex: 1,
@@ -351,11 +346,13 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderBottomWidth: 1.25,
     borderColor: theme.colors.accent.grey,
+    marginBottom: 25,
   },
   tabButton: {
     paddingVertical: 12,
     paddingHorizontal: 18,
-    width: "50%",
+    // width: "50%", set depending on number of tabs
+    width: "100%",
     alignItems: "center",
   },
   tabButtonActive: {
@@ -376,7 +373,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 8,
-    paddingLeft: 32
+    paddingLeft: 32,
   },
   image: {
     width: 100,

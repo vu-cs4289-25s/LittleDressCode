@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.backgrounds.primary,
-    padding: 16,
+    paddingHorizontal: theme.padding.normal,
     paddingBottom: 0,
   },
   collectionSection: {
