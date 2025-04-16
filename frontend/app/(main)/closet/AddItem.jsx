@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
-  TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
   Text,
   TextInput,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import AccordionView from "../../../components/AccordionView";
@@ -16,6 +16,7 @@ import { addClothingItem } from "../../utils/clothingService";
 import { auth } from "@/app/utils/firebaseConfig";
 import BackHeader from "@/components/headers/BackHeader";
 import TextButton from "@/components/common/TextButton";
+import { uploadImage } from "@/app/utils/upload";
 
 const AddItem = () => {
   const { imageUrl } = useLocalSearchParams();
@@ -24,73 +25,51 @@ const AddItem = () => {
   const [loading, setLoading] = useState(true);
   const [selectedButtons, setSelectedButtons] = useState({});
   const [name, setName] = useState("");
+  const [processedImageUri, setProcessedImageUri] = useState(imageUrl);
 
-  
   useEffect(() => {
     setSections([
       {
         id: 1,
         title: "Category",
         buttons: [
-          { label: "Tops" },
-          { label: "Pants" },
-          { label: "Skirts" },
-          { label: "Dresses" },
-          { label: "Bags" },
-          { label: "Shoes" },
-          { label: "Outerwear" },
-          { label: "Jewelry" },
-          { label: "Hats" },
+          { label: "Tops" }, { label: "Pants" }, { label: "Skirts" },
+          { label: "Dresses" }, { label: "Bags" }, { label: "Shoes" },
+          { label: "Outerwear" }, { label: "Jewelry" }, { label: "Hats" },
         ],
       },
       {
         id: 2,
         title: "Color",
         buttons: [
-          { label: "Red" },
-          { label: "Blue" },
-          { label: "Black" },
-          { label: "White" },
-          { label: "Green" },
-          { label: "Yellow" },
-          { label: "Pink" },
-          { label: "Gray" },
-          { label: "Brown" },
-          { label: "Purple" },
-          { label: "Orange" },
-          { label: "Multicolor" },
+          { label: "Red" }, { label: "Blue" }, { label: "Black" },
+          { label: "White" }, { label: "Green" }, { label: "Yellow" },
+          { label: "Pink" }, { label: "Gray" }, { label: "Brown" },
+          { label: "Purple" }, { label: "Orange" }, { label: "Multicolor" },
         ],
       },
       {
         id: 3,
         title: "Style",
         buttons: [
-          { label: "Casual" },
-          { label: "Formal" },
-          { label: "Sporty" },
-          { label: "Streetwear" },
-          { label: "Boho" },
+          { label: "Casual" }, { label: "Formal" },
+          { label: "Sporty" }, { label: "Streetwear" }, { label: "Boho" },
         ],
       },
       {
         id: 4,
         title: "Season",
         buttons: [
-          { label: "Spring" },
-          { label: "Summer" },
-          { label: "Fall" },
-          { label: "Winter" },
-          { label: "Any" },
+          { label: "Spring" }, { label: "Summer" },
+          { label: "Fall" }, { label: "Winter" }, { label: "Any" },
         ],
       },
       {
         id: 5,
         title: "Fit",
         buttons: [
-          { label: "Tight" },
-          { label: "Regular" },
-          { label: "Loose" },
-          { label: "Oversized" },
+          { label: "Tight" }, { label: "Regular" },
+          { label: "Loose" }, { label: "Oversized" },
         ],
       },
     ]);
@@ -105,7 +84,17 @@ const AddItem = () => {
         : [...(prev[categoryId] || []), tag],
     }));
   };
-  
+
+  const handleUploadImage = () => {
+    uploadImage((finalImageUrl) => {
+      if (finalImageUrl) {
+        setProcessedImageUri(finalImageUrl);
+      } else {
+        Alert.alert("Error", "Image upload or processing failed.");
+      }
+    });
+  };
+
   const saveClothingItem = async () => {
     const userId = auth.currentUser?.uid;
 
@@ -117,10 +106,10 @@ const AddItem = () => {
       style: selectedButtons[3] || [],
       season: selectedButtons[4] || [],
       fit: selectedButtons[5] || [],
-      imageUrl: imageUrl || null,
+      imageUrl: processedImageUri || null,
     };
 
-    console.log("Clothing Data to Save:", clothingData); // Debug print
+    console.log("Clothing Data to Save:", clothingData);
 
     try {
       await addClothingItem(
@@ -133,17 +122,17 @@ const AddItem = () => {
         clothingData.fit,
         clothingData.imageUrl
       );
-      console.log(" Clothing item saved successfully!");
+      console.log("Clothing item saved successfully!");
       router.back();
     } catch (error) {
-      console.error(" Error saving clothing item:", error);
+      console.error("Error saving clothing item:", error);
     }
   };
 
   return (
     <View style={styles.container}>
       <BackHeader />
-      <Image source={{ uri: imageUrl }} style={styles.image} />
+      <Image source={{ uri: processedImageUri }} style={styles.image} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={{ marginBottom: 6, fontWeight: "bold" }}>Item Name</Text>
@@ -171,7 +160,15 @@ const AddItem = () => {
           />
         )}
       </ScrollView>
+
       <View style={styles.containerButton}>
+        <TextButton
+          title="Upload Image"
+          size="large"
+          color="dark"
+          onPress={handleUploadImage}
+        />
+        <View style={{ height: 12 }} />
         <TextButton
           title="Add Item"
           size="large"
@@ -179,7 +176,6 @@ const AddItem = () => {
           onPress={saveClothingItem}
         />
       </View>
-
     </View>
   );
 };
@@ -196,15 +192,8 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     marginBottom: 16,
   },
-  saveButton: {
-    backgroundColor: theme.colors.buttonBackground.dark,
-    height: 53,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 26,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 90,
+  scrollContent: {
+    paddingBottom: 150,
   },
   containerButton: {
     padding: 16,

@@ -82,6 +82,7 @@ export const getFilteredClothingItems = async (userId, selectedFilters) => {
     const tagFilters = selectedFilters.filter((f) => f !== "Favorited");
 
     const filtered = allItems.filter((item) => {
+      // Collect the tags from the item (category, color, etc.)
       const tags = [
         ...(item.category || []),
         ...(item.color || []),
@@ -90,11 +91,13 @@ export const getFilteredClothingItems = async (userId, selectedFilters) => {
         ...(item.fit || []),
       ];
 
-      const matchesTags = tagFilters.every((filter) => tags.includes(filter));
-      const matchesFavorite = isFilteringFavorites
-        ? item.favorite === true
-        : true;
+      // Check if the item matches any selected filter
+      const matchesTags = tagFilters.length > 0 ? tagFilters.some((filter) => tags.includes(filter)) : true;
 
+      // Check if the item matches the favorite filter (if selected)
+      const matchesFavorite = isFilteringFavorites ? item.favorite === true : true;
+
+      // Return items that match at least one filter
       return matchesTags && matchesFavorite;
     });
 
@@ -104,3 +107,5 @@ export const getFilteredClothingItems = async (userId, selectedFilters) => {
     return [];
   }
 };
+
+
