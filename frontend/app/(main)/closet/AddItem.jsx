@@ -16,6 +16,7 @@ import { addClothingItem } from "../../utils/clothingService";
 import { auth } from "@/app/utils/firebaseConfig";
 import BackHeader from "@/components/headers/BackHeader";
 import TextButton from "@/components/common/TextButton";
+import TextField from "@/components/common/Textfield";
 
 const AddItem = () => {
   const { imageUrl } = useLocalSearchParams();
@@ -142,25 +143,19 @@ const AddItem = () => {
 
   return (
     <View style={styles.container}>
-      <BackHeader />
+      <BackHeader title={"New Item"} />
       <Image source={{ uri: imageUrl }} style={styles.image} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={{ marginBottom: 6, fontWeight: "bold" }}>Item Name</Text>
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          placeholder="Enter item name"
-          style={{
-            height: 40,
-            borderColor: "#ccc",
-            borderWidth: 1,
-            borderRadius: 8,
-            paddingHorizontal: 12,
-            marginBottom: 12,
-          }}
-        />
 
+         <TextField
+              size="large"
+              onChangeText={setName}
+              value={name}
+              placeholder={"Enter item name"}
+              icon="edit"
+            />
         {loading ? (
           <ActivityIndicator size="large" color="blue" />
         ) : (
@@ -188,13 +183,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 16,
+
   },
   image: {
     width: "100%",
     height: 200,
     resizeMode: "contain",
     marginBottom: 16,
+    padding: 10,
+    backgroundColor: theme.colors.backgrounds.secondary,
+
   },
   saveButton: {
     backgroundColor: theme.colors.buttonBackground.dark,
@@ -205,6 +203,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 90,
+  },
+  scrollContent: {
+    paddingHorizontal: theme.padding.normal,
   },
   containerButton: {
     padding: 16,

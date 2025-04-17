@@ -181,9 +181,6 @@ const ClosetDetail = () => {
   return (
     <View>
       <InspectHeader
-        title={"Edit Item"}
-        id={id}
-        ref={detailRef}
         isFavorited={isFavorited}
         toggleFavorite={handleToggleFavorite}
       />
@@ -192,7 +189,6 @@ const ClosetDetail = () => {
         style={styles.image}
         resizeMode="contain"
       />
-
       <View style={styles.container}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -207,7 +203,7 @@ const ClosetDetail = () => {
                   <Text style={styles.inputLabel}>Item Name</Text>
                 )}
                 <View style={styles.details}>
-                  <ShareButton type="closet" id={id} refToCapture={detailRef} />
+                  <ShareButton  type="closet" id={id} refToCapture={detailRef} />
                   <DeleteButton
                     itemId={id}
                     collection="clothingItems"
@@ -273,7 +269,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 200,
     borderRadius: 10,
-    marginBottom: 16,
+    marginBottom: 15,
     backgroundColor: theme.colors.backgrounds.secondary,
     padding: 20,
   },

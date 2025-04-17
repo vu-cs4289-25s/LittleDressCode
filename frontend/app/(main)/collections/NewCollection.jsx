@@ -1,18 +1,25 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, ScrollView, Text, TouchableOpacity, Dimensions } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { auth, db } from "@/app/utils/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import theme from "@/styles/theme";
-import Header from "@/components/headers/Header";
 import ItemContainer from "@/components/organization/ItemContainer";
 import TextField from "@/components/common/Textfield";
 import AccordionView from "@/components/AccordionView";
 import { addCollection } from "@/app/utils/collectionsService";
 import { useFocusEffect } from "@react-navigation/native";
-
-const { width } = Dimensions.get('window');
-const OUTFIT_CONTAINER_WIDTH = width * 0.8;
+import BackHeader from "@/components/headers/BackHeader";
+import TextButton from "@/components/common/TextButton";
+const { width } = Dimensions.get("window");
+const OUTFIT_CONTAINER_WIDTH = width * 0.5;
 
 const sections = [
   {
@@ -110,14 +117,7 @@ const NewCollection = () => {
     ];
 
     try {
-      await addCollection(
-        userId,
-        name.trim(),
-        outfitIds,
-        "",
-        tags,
-        true
-      );
+      await addCollection(userId, name.trim(), outfitIds, "", tags, true);
       router.replace("/");
     } catch (err) {
       console.error("Error saving collection:", err);
@@ -126,19 +126,13 @@ const NewCollection = () => {
 
   return (
     <View style={styles.container}>
-      <Header
-        title="New Collection"
-        showBackButton
-        backTo="/outfits"
-        showSearch={false}
-      />
+      <BackHeader title="New Collection" noPadding={true} />
 
       <ScrollView
         style={styles.body}
         contentContainerStyle={styles.bodyContent}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Outfits Horizontal Scroll */}
         <View style={styles.outfitsSection}>
           {isLoading ? (
             <Text>Loading outfits...</Text>
@@ -171,7 +165,6 @@ const NewCollection = () => {
           )}
         </View>
 
-        {/* Collection Name Input */}
         <View style={styles.inputWrapper}>
           <TextField
             icon="edit"
@@ -181,7 +174,6 @@ const NewCollection = () => {
           />
         </View>
 
-        {/* Tags Accordion */}
         <View style={styles.accordianWrapper}>
           <AccordionView
             title="Tag this Collection"
@@ -190,12 +182,16 @@ const NewCollection = () => {
             onSelectButton={onSelectButton}
           />
         </View>
-
-        {/* Save Button */}
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Save Collection</Text>
-        </TouchableOpacity>
       </ScrollView>
+
+      <View style={styles.containerButton}>
+        <TextButton
+          title="Save Collection"
+          size="large"
+          color="dark"
+          onPress={handleSave}
+        />
+      </View>
     </View>
   );
 };
@@ -213,56 +209,48 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   outfitsSection: {
-    paddingHorizontal: 16,
     marginTop: 16,
     marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 12,
-    color: '#333',
+    color: "#333",
   },
   outfitsScrollContent: {
     paddingRight: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   outfitContainer: {
     width: OUTFIT_CONTAINER_WIDTH,
     marginRight: 16,
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   itemContainer: {
-    width: '100%',
+    width: "100%",
     aspectRatio: 1,
   },
   noOutfitsText: {
-    textAlign: 'center',
-    color: '#999',
+    textAlign: "center",
+    color: "#999",
     marginVertical: 20,
   },
   inputWrapper: {
-    paddingHorizontal: 16,
     marginBottom: 24,
   },
   accordianWrapper: {
-    paddingHorizontal: 16,
     marginBottom: 24,
   },
-  saveButton: {
-    backgroundColor: '#000',
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 16,
-    marginTop: 8,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  containerButton: {
+    padding: 16,
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    backgroundColor: "white",
+    zIndex: 10,
   },
 });
 
