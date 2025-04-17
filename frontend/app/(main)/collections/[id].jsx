@@ -243,7 +243,7 @@ const EditCollectionScreen = () => {
                   <ShareButton type="closet" id={id} refToCapture={detailRef} />
                   <DeleteButton
                     itemId={id}
-                    collection="clothingItems"
+                    collection="collections"
                     onSuccess={() => {
                       Alert.alert("Item Deleted");
                       router.back();
