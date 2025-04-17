@@ -123,6 +123,7 @@ const styles = StyleSheet.create({
   },
   loginHeader: {
     marginBottom: 10,
+    alignItems:"center"
   },
   logoContainer: {
     alignItems: "center",

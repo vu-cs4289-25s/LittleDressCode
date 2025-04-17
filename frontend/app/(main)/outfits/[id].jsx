@@ -219,7 +219,7 @@ const OutfitDetail = () => {
                   <ShareButton type="closet" id={id} refToCapture={detailRef} />
                   <DeleteButton
                     itemId={id}
-                    collection="clothingItems"
+                    collection="outfits"
                     onSuccess={() => {
                       Alert.alert("Item Deleted");
                       router.back();
