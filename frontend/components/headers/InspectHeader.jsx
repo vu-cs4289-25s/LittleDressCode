@@ -33,7 +33,7 @@ const InspectHeader = ({ backTo = null, isFavorited, toggleFavorite }) => {
             }
           />
         </TouchableOpacity>
-      </View>{" "}
+      </View>
     </SafeAreaView>
   );
 };

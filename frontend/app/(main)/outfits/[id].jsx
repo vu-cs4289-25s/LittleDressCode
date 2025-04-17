@@ -181,12 +181,8 @@ const OutfitDetail = () => {
   return (
     <View style={styles.bigContainer}>
       <InspectHeader
-        id={id}
-        ref={detailRef}
-        src={clothingItems}
         isFavorited={isFavorited}
         toggleFavorite={handleToggleFavorite}
-        isOutfit={true}
       />
       <View style={styles.imageScrollContainer}>
         <FlatList
@@ -281,7 +277,7 @@ const styles = StyleSheet.create({
   },
   imageScrollContainer: {
     height: 200,
-    marginBottom: 20,
+    marginBottom: 15,
     backgroundColor: theme.colors.backgrounds.secondary,
   },
   horizontalScrollContent: {

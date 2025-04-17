@@ -150,10 +150,12 @@ const CollectionScreen = () => {
       <FilterBar
         filters={COLLECTION_FILTERS}
         onFilterChange={handleFilterChange}
+        defaultFilters={["Casual", "Work"]}
+
       />
 
       {loading ? (
-        <Text>Loading collections...</Text>
+        <Text style={styles.loadingText}>Loading collections...</Text>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
           {collections.map((col) => (
@@ -232,11 +234,14 @@ const styles = StyleSheet.create({
     paddingRight: 16,
   },
   outfitItem: {
-    marginRight: 12,
-    backgroundColor: theme.colors.backgrounds.secondary,
-    borderRadius: 12,
-    padding: 12,
+    width: 150,
+    marginRight: 16
   },
+  loadingText: {
+    paddingTop: theme.padding.normal,
+    fontSize: 15,
+    fontStyle: 'italic'
+  }
 });
 
 export default CollectionScreen;

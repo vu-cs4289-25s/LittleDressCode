@@ -107,11 +107,12 @@ const ClosetScreen = () => {
       <FilterBar
         filters={CLOTHING_FILTERS}
         onFilterChange={handleFilterChange}
+        defaultFilters={["Tops", "Pants"]}
       />
 
       {isLoading ? (
         <View style={styles.container}>
-          <Text>Loading your closet...</Text>
+          <Text style={styles.loadingText}>Loading your closet...</Text>
         </View>
       ) : (
         <GridLayout
@@ -133,6 +134,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.padding.normal,
     paddingBottom: 0,
   },
+  loadingText: {
+    paddingTop: theme.padding.normal,
+    fontSize: 15,
+    fontStyle: 'italic'
+  }
 });
 
 export default ClosetScreen;

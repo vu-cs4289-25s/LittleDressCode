@@ -7,10 +7,16 @@ import {
   SafeAreaView,
   Alert,
   Dimensions,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { doc, getDoc, getDocs, updateDoc, collection } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  getDocs,
+  updateDoc,
+  collection,
+} from "firebase/firestore";
 import { db } from "@/app/utils/firebaseConfig";
 import TextField from "@/components/common/Textfield";
 import AccordionViewEdit from "@/components/AccordionViewEdit";
@@ -19,6 +25,7 @@ import DeleteButton from "@/components/common/DeleteIcon";
 import ShareButton from "@/components/buttons/ShareButton";
 import theme from "@/styles/theme";
 import ItemContainer from "@/components/organization/ItemContainer";
+import InspectHeader from "@/components/headers/InspectHeader";
 
 const { width } = Dimensions.get("window");
 const OUTFIT_CONTAINER_WIDTH = width * 0.8;
@@ -50,6 +57,7 @@ const EditCollectionScreen = () => {
   const [selectedOutfits, setSelectedOutfits] = useState([]);
   const [allOutfits, setAllOutfits] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFavorited, setIsFavorited] = useState(true);
 
   useEffect(() => {
     const fetchCollection = async () => {
@@ -62,6 +70,7 @@ const EditCollectionScreen = () => {
           setCollectionData({ id: docSnap.id, ...data });
           setName(data.name || "");
           setSelectedOutfits(data.outfits || []);
+          setIsFavorited(data.favorite)
 
           // Initialize selectedButtons with the correct structure
           const tags = data.tags || [];
@@ -85,7 +94,10 @@ const EditCollectionScreen = () => {
     const fetchOutfits = async () => {
       try {
         const snapshot = await getDocs(collection(db, "outfits"));
-        const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setAllOutfits(data);
       } catch (err) {
         console.error("Error fetching outfits:", err);
@@ -131,111 +143,165 @@ const EditCollectionScreen = () => {
     );
   }
 
+  const handleToggleFavorite = async () => {
+    try {
+      const newValue = !isFavorited;
+      setIsFavorited(newValue);
+
+      const docRef = doc(db, "clothingItems", id);
+      await updateDoc(docRef, {
+        favorite: newValue,
+      });
+    } catch (err) {
+      console.error("Failed to update favorite status:", err);
+      Alert.alert("Error", "Could not update favorite status.");
+    }
+  };
+
+  <View style={styles.outfitsSection}>
+    {outfitObjects.length > 0 ? (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.outfitsScrollContent}
+        decelerationRate="fast"
+        snapToInterval={OUTFIT_CONTAINER_WIDTH + 16}
+        snapToAlignment="center"
+      >
+        {outfitObjects.map((item) => (
+          <View key={item.id} style={styles.outfitContainer}>
+            <ItemContainer
+              clothingItem={item}
+              isFavorited={false}
+              toggleFavorite={() => {}}
+              isSelectable={false}
+              isSelected={false}
+              showControls={false}
+              isOutfit={true}
+              style={styles.itemContainer}
+            />
+          </View>
+        ))}
+      </ScrollView>
+    ) : (
+      <Text style={styles.noOutfitsText}>No outfits selected</Text>
+    )}
+  </View>;
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <DeleteButton
-          itemId={id}
-          collection="collections"
-          onSuccess={() => {
-            Alert.alert("Collection deleted");
-            router.back();
-            router.setParams({ refresh: Date.now() });
-          }}
-          color="black"
-          size={26}
-          buttonStyle={styles.deleteButton}
-        />
-        <ShareButton type="collection" id={id} refToCapture={detailRef} />
+    <View style={styles.bigContainer}>
+      <InspectHeader
+        isFavorited={isFavorited}
+        toggleFavorite={handleToggleFavorite}
+      />
+
+      <View style={styles.outfitsSection}>
+        {outfitObjects.length > 0 ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.outfitsScrollContent}
+            decelerationRate="fast"
+            snapToInterval={OUTFIT_CONTAINER_WIDTH + 16}
+            snapToAlignment="center"
+          >
+            {outfitObjects.map((item) => (
+              <View key={item.id} style={styles.outfitContainer}>
+                <ItemContainer
+                  clothingItem={item}
+                  isFavorited={false}
+                  toggleFavorite={() => {}}
+                  isSelectable={false}
+                  isSelected={false}
+                  showControls={false}
+                  isOutfit={true}
+                  style={styles.itemContainer}
+                  size={400}
+                />
+              </View>
+            ))}
+          </ScrollView>
+        ) : (
+          <Text style={styles.noOutfitsText}>No outfits selected</Text>
+        )}
       </View>
 
-      <ScrollView
-        ref={detailRef}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.outfitsSection}>
-          {outfitObjects.length > 0 ? (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.outfitsScrollContent}
-              decelerationRate="fast"
-              snapToInterval={OUTFIT_CONTAINER_WIDTH + 16}
-              snapToAlignment="center"
-            >
-              {outfitObjects.map((item) => (
-                <View key={item.id} style={styles.outfitContainer}>
-                  <ItemContainer
-                    clothingItem={item}
-                    isFavorited={false}
-                    toggleFavorite={() => {}}
-                    isSelectable={false}
-                    isSelected={false}
-                    showControls={false}
-                    isOutfit={true}
-                    style={styles.itemContainer}
+      <View style={styles.container}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View ref={detailRef} style={styles.content}>
+            <View style={styles.nameInputContainer}>
+              <View style={styles.infoHeader}>
+                {collectionData?.name ? (
+                  <Text style={styles.inputLabel}>{collectionData.name}</Text>
+                ) : (
+                  <Text style={styles.inputLabel}>Item Name</Text>
+                )}
+                <View style={styles.details}>
+                  <ShareButton type="closet" id={id} refToCapture={detailRef} />
+                  <DeleteButton
+                    itemId={id}
+                    collection="clothingItems"
+                    onSuccess={() => {
+                      Alert.alert("Item Deleted");
+                      router.back();
+                    }}
+                    color="black"
+                    size={26}
+                    buttonStyle={styles.deleteButton}
                   />
                 </View>
-              ))}
-            </ScrollView>
-          ) : (
-            <Text style={styles.noOutfitsText}>No outfits selected</Text>
-          )}
-        </View>
-
-        <View style={styles.content}>
-          <Text style={styles.collectionName}>{name}</Text>
-
-          <View style={styles.nameInputContainer}>
+              </View>
+            </View>
             <TextField
-              icon="edit"
               size="large"
               onChangeText={setName}
               value={name}
-              placeholder="Edit Collection Name"
+              placeholder={collectionData ? collectionData.name : "Item name"}
+              icon="edit"
             />
-          </View>
 
-          <View style={styles.accordionContainer}>
-            <AccordionViewEdit
-              sections={tagSections}
-              initialTags={selectedButtons}
-              onTagChange={setSelectedButtons}
-            />
-          </View>
+            <View style={styles.accordionContainer}>
+              <AccordionViewEdit
+                sections={tagSections}
+                initialTags={selectedButtons}
+                onTagChange={setSelectedButtons}
+              />
+            </View>
 
-          <View style={styles.buttonWrapper}>
-            <TextButton
-              title="Save Changes"
-              size="large"
-              color="dark"
-              onPress={handleSave}
-            />
+            <View style={styles.buttonWrapper}>
+              <TextButton
+                title="Save Changes"
+                size="large"
+                color="dark"
+                onPress={handleSave}
+              />
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.backgrounds.primary,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
     backgroundColor: "white",
+    paddingHorizontal: theme.padding.normal,
+  },
+  bigContainer: {
+    backgroundColor: "white",
+    flex: 1,
   },
   scrollContent: {
     paddingBottom: 100,
   },
-  content: {
-    paddingHorizontal: 16,
+  inputLabel: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#333",
   },
   collectionName: {
     fontSize: 22,
@@ -244,9 +310,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   outfitsSection: {
-    paddingHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 24,
+    height: 200,
+    marginBottom: 15,
+    backgroundColor: theme.colors.backgrounds.secondary,
   },
   outfitsScrollContent: {
     paddingRight: 16,
@@ -255,8 +321,6 @@ const styles = StyleSheet.create({
   outfitContainer: {
     width: OUTFIT_CONTAINER_WIDTH,
     marginRight: 16,
-    borderRadius: 12,
-    overflow: "hidden",
   },
   itemContainer: {
     width: "100%",
@@ -279,6 +343,18 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 8,
+  },
+  infoHeader: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  details: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
   },
 });
 

@@ -47,6 +47,7 @@ const theme = {
   },
   padding: {
     small: 10,
+    medium: 20,
     normal: 25
   },
   borderRadius: {
