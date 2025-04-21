@@ -2,17 +2,15 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
-  TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
   Text,
-  TextInput,
   ScrollView,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import AccordionView from "../../../components/AccordionView";
-import theme from "../../../styles/theme";
-import { addClothingItem } from "../../utils/clothingService";
+import AccordionView from "@/components/AccordionView";
+import theme from "@/styles/theme";
+import { addClothingItem } from "@/app/utils/clothingService";
 import { auth } from "@/app/utils/firebaseConfig";
 import BackHeader from "@/components/headers/BackHeader";
 import TextButton from "@/components/common/TextButton";
@@ -26,7 +24,6 @@ const AddItem = () => {
   const [selectedButtons, setSelectedButtons] = useState({});
   const [name, setName] = useState("");
 
-  
   useEffect(() => {
     setSections([
       {
@@ -106,7 +103,7 @@ const AddItem = () => {
         : [...(prev[categoryId] || []), tag],
     }));
   };
-  
+
   const saveClothingItem = async () => {
     const userId = auth.currentUser?.uid;
 
@@ -121,7 +118,7 @@ const AddItem = () => {
       imageUrl: imageUrl || null,
     };
 
-    console.log("Clothing Data to Save:", clothingData); // Debug print
+    console.log("🧥 Clothing Data to Save:", clothingData);
 
     try {
       await addClothingItem(
@@ -134,10 +131,10 @@ const AddItem = () => {
         clothingData.fit,
         clothingData.imageUrl
       );
-      console.log(" Clothing item saved successfully!");
+      console.log("✅ Clothing item saved successfully!");
       router.back();
     } catch (error) {
-      console.error(" Error saving clothing item:", error);
+      console.error("❌ Error saving clothing item:", error);
     }
   };
 
@@ -147,15 +144,15 @@ const AddItem = () => {
       <Image source={{ uri: imageUrl }} style={styles.image} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={{ marginBottom: 6, fontWeight: "bold" }}>Item Name</Text>
+        <Text style={styles.label}>Item Name</Text>
+        <TextField
+          size="large"
+          onChangeText={setName}
+          value={name}
+          placeholder={"Enter item name"}
+          icon="edit"
+        />
 
-         <TextField
-              size="large"
-              onChangeText={setName}
-              value={name}
-              placeholder={"Enter item name"}
-              icon="edit"
-            />
         {loading ? (
           <ActivityIndicator size="large" color="blue" />
         ) : (
@@ -166,6 +163,7 @@ const AddItem = () => {
           />
         )}
       </ScrollView>
+
       <View style={styles.containerButton}>
         <TextButton
           title="Add Item"
@@ -174,7 +172,6 @@ const AddItem = () => {
           onPress={saveClothingItem}
         />
       </View>
-
     </View>
   );
 };
@@ -183,7 +180,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-
   },
   image: {
     width: "100%",
@@ -192,20 +188,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     padding: 10,
     backgroundColor: theme.colors.backgrounds.secondary,
-
-  },
-  saveButton: {
-    backgroundColor: theme.colors.buttonBackground.dark,
-    height: 53,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 26,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 90,
   },
   scrollContent: {
     paddingHorizontal: theme.padding.normal,
+    paddingBottom: 150,
   },
   containerButton: {
     padding: 16,
@@ -213,6 +199,10 @@ const styles = StyleSheet.create({
     bottom: 25,
     left: 0,
     right: 0,
+  },
+  label: {
+    marginBottom: 6,
+    fontWeight: "bold",
   },
 });
 

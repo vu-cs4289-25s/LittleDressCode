@@ -1,8 +1,10 @@
 import { Alert } from "react-native";
+import { Buffer } from "buffer";
 import * as ImagePicker from "expo-image-picker";
 import AWS from "aws-sdk";
+import { removeBackground } from "@/services/backgroundRemove";
 
-// Configure AWS S3
+// AWS Config
 const s3 = new AWS.S3({
   accessKeyId: "AKIA42PHH65MOHVDTVGP",
   secretAccessKey: "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",
@@ -21,10 +23,7 @@ export const uploadImage = async (onUploadSuccess) => {
       : ImagePicker.requestMediaLibraryPermissionsAsync());
 
     if (status !== "granted") {
-      Alert.alert(
-        "Permission Denied",
-        "We need camera/gallery access to upload images."
-      );
+      Alert.alert("Permission Denied", "We need access to your photos or camera.");
       return;
     }
 
@@ -44,34 +43,76 @@ export const uploadImage = async (onUploadSuccess) => {
 
     if (!result.canceled) {
       const imageUri = result.assets[0].uri;
-      await uploadImageToS3(imageUri);
+      await handleImageUpload(imageUri);
     }
   };
 
-  const uploadImageToS3 = async (uri) => {
+  const handleImageUpload = async (uri) => {
     try {
       const response = await fetch(uri);
-      const blob = await response.blob();
+      const arrayBuffer = await response.arrayBuffer();
+      const originalBase64 = Buffer.from(arrayBuffer).toString("base64");
       const fileName = uri.split("/").pop();
 
-      const params = {
-        Bucket: "upload-test-using-s3",
-        Key: `${fileName}.jpg`,
-        ContentType: "image/jpeg",
-        Body: blob,
-      };
+      console.log("📤 Uploading original image to S3...");
 
-      s3.upload(params, (err, data) => {
-        if (err) {
-          console.error("Error uploading to S3:", err);
-          Alert.alert("Upload Failed", "Something went wrong while uploading.");
-        } else {
-          console.log("Upload successful:", data.Location);
-          onUploadSuccess(data.Location);
-        }
+      const s3Url = await new Promise((resolve, reject) => {
+        s3.upload(
+          {
+            Bucket: "upload-test-using-s3",
+            Key: fileName,
+            Body: Buffer.from(originalBase64, "base64"),
+            ContentEncoding: "base64",
+            ContentType: "image/jpeg",
+            // Removed ACL due to Bucket Ownership settings
+          },
+          (err, data) => {
+            if (err) reject(err);
+            else {
+              console.log("✅ Original uploaded. S3 URL:", data.Location);
+              resolve(data.Location);
+            }
+          }
+        );
       });
+
+      console.log("📤 Sending to remove.bg:", s3Url);
+
+      const processedBase64 = await removeBackground(s3Url);
+      console.log("✅ Processed image received from remove.bg");
+
+      const processedBody = Buffer.from(
+        processedBase64.replace(/^data:image\/\w+;base64,/, ""),
+        "base64"
+      );
+
+      console.log("📤 Uploading processed image back to S3...");
+
+      await new Promise((resolve, reject) => {
+        s3.upload(
+          {
+            Bucket: "upload-test-using-s3",
+            Key: fileName,
+            Body: processedBody,
+            ContentEncoding: "base64",
+            ContentType: "image/png",
+            // Removed ACL here too
+          },
+          (err, data) => {
+            if (err) reject(err);
+            else {
+              console.log("✅ Processed image uploaded. Final URL:", data.Location);
+              resolve(data.Location);
+            }
+          }
+        );
+      });
+
+      const finalUrl = `https://upload-test-using-s3.s3.us-east-2.amazonaws.com/${fileName}`;
+      console.log("🔁 Passing processed URL to AddItem:", finalUrl);
+      onUploadSuccess(finalUrl);
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error("❌ Error during image upload or background removal:", error);
     }
   };
 

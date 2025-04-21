@@ -1,9 +1,9 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
     "allowJs": true,
-    "jsx": "react-native", 
+    "noEmit": true,
+    "jsx": "react-native",
     "paths": {
       "@/*": [
         "./*"
@@ -13,8 +13,12 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "**/*.jsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-, "app/(main)/(tabs)/_layout.js", "app/_layout.jsx", "app/(auth)/welcome.jsx", "components/ItemContainer.jsx"  ]
+    "expo-env.d.ts",
+    "app/(main)/(tabs)/_layout.js",
+    "app/_layout.jsx",
+    "app/(auth)/welcome.jsx",
+    "components/ItemContainer.jsx"
+  ],
+  "extends": "expo/tsconfig.base"
 }
