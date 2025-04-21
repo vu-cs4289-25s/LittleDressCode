@@ -14,7 +14,7 @@ import AccordionView from "../AccordionView";
 
 const MAX_VISIBLE = 10;
 
-const FilterBar = ({ filters = {}, onFilterChange, defaultFilters }) => {
+const FilterBar = ({ filters = {}, onFilterChange, defaultFilters = [] }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [visibleFilters, setVisibleFilters] = useState([]);

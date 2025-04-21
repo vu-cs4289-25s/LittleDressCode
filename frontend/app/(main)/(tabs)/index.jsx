@@ -76,14 +76,9 @@ const CollectionScreen = () => {
     setCollections(filtered);
   };
 
-  // Wait for user login state before fetching collections
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-      } else {
-        setUser(null);
-      }
+      setUser(firebaseUser || null);
     });
 
     return unsubscribe;
@@ -151,7 +146,6 @@ const CollectionScreen = () => {
         filters={COLLECTION_FILTERS}
         onFilterChange={handleFilterChange}
         defaultFilters={["Casual", "Work"]}
-
       />
 
       {loading ? (
@@ -235,13 +229,13 @@ const styles = StyleSheet.create({
   },
   outfitItem: {
     width: 150,
-    marginRight: 16
+    marginRight: 16,
   },
   loadingText: {
     paddingTop: theme.padding.normal,
     fontSize: 15,
-    fontStyle: 'italic'
-  }
+    fontStyle: "italic",
+  },
 });
 
 export default CollectionScreen;
