@@ -53,8 +53,9 @@ export const uploadImage = async (onUploadSuccess) => {
       const arrayBuffer = await response.arrayBuffer();
       const originalBase64 = Buffer.from(arrayBuffer).toString("base64");
       const fileName = uri.split("/").pop();
-  
-      // Upload original image to S3
+
+      console.log("📤 Uploading original image to S3...");
+
       const s3Url = await new Promise((resolve, reject) => {
         s3.upload(
           {
@@ -63,26 +64,30 @@ export const uploadImage = async (onUploadSuccess) => {
             Body: Buffer.from(originalBase64, "base64"),
             ContentEncoding: "base64",
             ContentType: "image/jpeg",
-            ACL: "public-read",
+            // Removed ACL due to Bucket Ownership settings
           },
           (err, data) => {
             if (err) reject(err);
             else {
-              console.log("Original upload successful:", data.Location);
+              console.log("✅ Original uploaded. S3 URL:", data.Location);
               resolve(data.Location);
             }
           }
         );
       });
-  
-      // Get processed base64 image from remove.bg
+
+      console.log("📤 Sending to remove.bg:", s3Url);
+
       const processedBase64 = await removeBackground(s3Url);
+      console.log("✅ Processed image received from remove.bg");
+
       const processedBody = Buffer.from(
         processedBase64.replace(/^data:image\/\w+;base64,/, ""),
         "base64"
       );
-  
-      // Overwrite the original S3 image with the processed version
+
+      console.log("📤 Uploading processed image back to S3...");
+
       await new Promise((resolve, reject) => {
         s3.upload(
           {
@@ -91,24 +96,25 @@ export const uploadImage = async (onUploadSuccess) => {
             Body: processedBody,
             ContentEncoding: "base64",
             ContentType: "image/png",
-            ACL: "public-read",
+            // Removed ACL here too
           },
           (err, data) => {
             if (err) reject(err);
             else {
-              console.log("Processed image upload successful:", data.Location);
+              console.log("✅ Processed image uploaded. Final URL:", data.Location);
               resolve(data.Location);
             }
           }
         );
       });
-  
-      onUploadSuccess(`https://upload-test-using-s3.s3.us-east-2.amazonaws.com/${fileName}`);
+
+      const finalUrl = `https://upload-test-using-s3.s3.us-east-2.amazonaws.com/${fileName}`;
+      console.log("🔁 Passing processed URL to AddItem:", finalUrl);
+      onUploadSuccess(finalUrl);
     } catch (error) {
-      console.error("Error during image upload or background removal:", error);
+      console.error("❌ Error during image upload or background removal:", error);
     }
   };
-  
 
   Alert.alert("Upload Image", "Choose an option", [
     { text: "Take a Picture", onPress: () => handleImagePick(true) },

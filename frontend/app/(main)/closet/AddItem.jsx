@@ -1,3 +1,4 @@
+// AddItem.jsx
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -75,6 +76,7 @@ const AddItem = () => {
     ]);
     setLoading(false);
   }, []);
+  
 
   const handleSelectButton = (categoryId, tag) => {
     setSelectedButtons((prev) => ({
@@ -83,16 +85,6 @@ const AddItem = () => {
         ? prev[categoryId].filter((selected) => selected !== tag)
         : [...(prev[categoryId] || []), tag],
     }));
-  };
-
-  const handleUploadImage = () => {
-    uploadImage((finalImageUrl) => {
-      if (finalImageUrl) {
-        setProcessedImageUri(finalImageUrl);
-      } else {
-        Alert.alert("Error", "Image upload or processing failed.");
-      }
-    });
   };
 
   const saveClothingItem = async () => {
@@ -109,8 +101,6 @@ const AddItem = () => {
       imageUrl: processedImageUri || null,
     };
 
-    console.log("Clothing Data to Save:", clothingData);
-
     try {
       await addClothingItem(
         clothingData.userId,
@@ -122,7 +112,6 @@ const AddItem = () => {
         clothingData.fit,
         clothingData.imageUrl
       );
-      console.log("Clothing item saved successfully!");
       router.back();
     } catch (error) {
       console.error("Error saving clothing item:", error);
@@ -140,14 +129,7 @@ const AddItem = () => {
           value={name}
           onChangeText={setName}
           placeholder="Enter item name"
-          style={{
-            height: 40,
-            borderColor: "#ccc",
-            borderWidth: 1,
-            borderRadius: 8,
-            paddingHorizontal: 12,
-            marginBottom: 12,
-          }}
+          style={styles.input}
         />
 
         {loading ? (
@@ -162,20 +144,14 @@ const AddItem = () => {
       </ScrollView>
 
       <View style={styles.containerButton}>
-        <TextButton
-          title="Upload Image"
-          size="large"
-          color="dark"
-          onPress={handleUploadImage}
-        />
-        <View style={{ height: 12 }} />
-        <TextButton
-          title="Add Item"
-          size="large"
-          color="dark"
-          onPress={saveClothingItem}
-        />
-      </View>
+  <TextButton
+    title="Add Item"
+    size="large"
+    color="dark"
+    onPress={saveClothingItem}
+  />
+</View>
+
     </View>
   );
 };
@@ -201,6 +177,14 @@ const styles = StyleSheet.create({
     bottom: 25,
     left: 0,
     right: 0,
+  },
+  input: {
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 12,
   },
 });
 

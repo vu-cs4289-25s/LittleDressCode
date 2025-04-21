@@ -1,3 +1,4 @@
+// closet.jsx
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import GridLayout from "@/components/organization/GridLayout";
@@ -23,7 +24,7 @@ const ClosetScreen = () => {
 
   const handleUploadSuccess = (url) => {
     router.push({
-      pathname: "/closet/AddItem",
+      pathname: "/closet/addItem",
       params: { imageUrl: url },
     });
   };
@@ -75,7 +76,6 @@ const ClosetScreen = () => {
     }
   };
 
-  // ✅ Wait for Firebase to load the user
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -88,7 +88,6 @@ const ClosetScreen = () => {
     return unsubscribe;
   }, []);
 
-  // ✅ Fetch clothing items when user is ready
   useFocusEffect(
     useCallback(() => {
       if (userId) {
