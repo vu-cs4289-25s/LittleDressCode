@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import theme from "@/styles/theme";
 import AddButton from "../buttons/AddButton";
 import TextField from "../common/Textfield";
+import theme from "@/styles/theme";
 
 const Header = ({
   title,
@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   container: {
-    padding: 10,
     gap: 8,
+    paddingTop: theme.padding.small,
   },
   main: {
     flexDirection: "row",

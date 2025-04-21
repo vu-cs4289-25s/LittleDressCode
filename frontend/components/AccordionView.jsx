@@ -99,7 +99,7 @@ const AccordionView = ({ sections, selectedButtons, onSelectButton }) => {
   const renderHeader = (section, index, isActive) => {
     const selected = selectedButtons[section.id] || [];
     const selectedText = selected.length > 0 ? selected.join(", ") : null;
-  
+
     return (
       <TouchableOpacity
         style={[styles.header, !isActive && styles.headerBorder]}
@@ -110,7 +110,9 @@ const AccordionView = ({ sections, selectedButtons, onSelectButton }) => {
         activeOpacity={1}
       >
         <View style={styles.headerContent}>
-          <View style={styles.iconStyle}>{getIconForSection(section.title)}</View>
+          <View style={styles.iconStyle}>
+            {getIconForSection(section.title)}
+          </View>
           <Text style={styles.headerText}>{section.title}</Text>
         </View>
         <View style={styles.headerRight}>
@@ -128,7 +130,6 @@ const AccordionView = ({ sections, selectedButtons, onSelectButton }) => {
       </TouchableOpacity>
     );
   };
-  
 
   const renderContent = (section, _, isActive) => {
     const allButtons = [...section.buttons];
@@ -294,7 +295,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     alignContent: "cemter",
     marginLeft: 8,
-    justifyContent: "cennter"
+    justifyContent: "cennter",
   },
   customInputContainer: {
     flexDirection: "row",
@@ -314,7 +315,7 @@ const styles = StyleSheet.create({
     gap: 6,
     maxWidth: "50%",
   },
-  
+
   selectedSummary: {
     color: "#007AFF",
     fontSize: 14,

@@ -67,9 +67,9 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
-    paddingTop: 16,
-    paddingHorizontal: 32,
+    backgroundColor: theme.colors.backgrounds.primary,
+    paddingHorizontal: theme.padding.normal,
+    paddingBottom: 0,
   },
   avatarContainer: {
     alignItems: "center",

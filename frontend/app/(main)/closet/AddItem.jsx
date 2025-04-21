@@ -1,4 +1,3 @@
-// AddItem.jsx
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -6,18 +5,16 @@ import {
   ActivityIndicator,
   StyleSheet,
   Text,
-  TextInput,
   ScrollView,
-  Alert,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import AccordionView from "../../../components/AccordionView";
-import theme from "../../../styles/theme";
-import { addClothingItem } from "../../utils/clothingService";
+import AccordionView from "@/components/AccordionView";
+import theme from "@/styles/theme";
+import { addClothingItem } from "@/app/utils/clothingService";
 import { auth } from "@/app/utils/firebaseConfig";
 import BackHeader from "@/components/headers/BackHeader";
 import TextButton from "@/components/common/TextButton";
-import { uploadImage } from "@/app/utils/upload";
+import TextField from "@/components/common/Textfield";
 
 const AddItem = () => {
   const { imageUrl } = useLocalSearchParams();
@@ -26,7 +23,6 @@ const AddItem = () => {
   const [loading, setLoading] = useState(true);
   const [selectedButtons, setSelectedButtons] = useState({});
   const [name, setName] = useState("");
-  const [processedImageUri, setProcessedImageUri] = useState(imageUrl);
 
   useEffect(() => {
     setSections([
@@ -34,49 +30,70 @@ const AddItem = () => {
         id: 1,
         title: "Category",
         buttons: [
-          { label: "Tops" }, { label: "Pants" }, { label: "Skirts" },
-          { label: "Dresses" }, { label: "Bags" }, { label: "Shoes" },
-          { label: "Outerwear" }, { label: "Jewelry" }, { label: "Hats" },
+          { label: "Tops" },
+          { label: "Pants" },
+          { label: "Skirts" },
+          { label: "Dresses" },
+          { label: "Bags" },
+          { label: "Shoes" },
+          { label: "Outerwear" },
+          { label: "Jewelry" },
+          { label: "Hats" },
         ],
       },
       {
         id: 2,
         title: "Color",
         buttons: [
-          { label: "Red" }, { label: "Blue" }, { label: "Black" },
-          { label: "White" }, { label: "Green" }, { label: "Yellow" },
-          { label: "Pink" }, { label: "Gray" }, { label: "Brown" },
-          { label: "Purple" }, { label: "Orange" }, { label: "Multicolor" },
+          { label: "Red" },
+          { label: "Blue" },
+          { label: "Black" },
+          { label: "White" },
+          { label: "Green" },
+          { label: "Yellow" },
+          { label: "Pink" },
+          { label: "Gray" },
+          { label: "Brown" },
+          { label: "Purple" },
+          { label: "Orange" },
+          { label: "Multicolor" },
         ],
       },
       {
         id: 3,
         title: "Style",
         buttons: [
-          { label: "Casual" }, { label: "Formal" },
-          { label: "Sporty" }, { label: "Streetwear" }, { label: "Boho" },
+          { label: "Casual" },
+          { label: "Formal" },
+          { label: "Sporty" },
+          { label: "Streetwear" },
+          { label: "Boho" },
         ],
       },
       {
         id: 4,
         title: "Season",
         buttons: [
-          { label: "Spring" }, { label: "Summer" },
-          { label: "Fall" }, { label: "Winter" }, { label: "Any" },
+          { label: "Spring" },
+          { label: "Summer" },
+          { label: "Fall" },
+          { label: "Winter" },
+          { label: "Any" },
         ],
       },
       {
         id: 5,
         title: "Fit",
         buttons: [
-          { label: "Tight" }, { label: "Regular" },
-          { label: "Loose" }, { label: "Oversized" },
+          { label: "Tight" },
+          { label: "Regular" },
+          { label: "Loose" },
+          { label: "Oversized" },
         ],
       },
     ]);
     setLoading(false);
   }, []);
-  
 
   const handleSelectButton = (categoryId, tag) => {
     setSelectedButtons((prev) => ({
@@ -98,8 +115,10 @@ const AddItem = () => {
       style: selectedButtons[3] || [],
       season: selectedButtons[4] || [],
       fit: selectedButtons[5] || [],
-      imageUrl: processedImageUri || null,
+      imageUrl: imageUrl || null,
     };
+
+    console.log("🧥 Clothing Data to Save:", clothingData);
 
     try {
       await addClothingItem(
@@ -112,24 +131,26 @@ const AddItem = () => {
         clothingData.fit,
         clothingData.imageUrl
       );
+      console.log("✅ Clothing item saved successfully!");
       router.back();
     } catch (error) {
-      console.error("Error saving clothing item:", error);
+      console.error("❌ Error saving clothing item:", error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <BackHeader />
-      <Image source={{ uri: processedImageUri }} style={styles.image} />
+      <BackHeader title={"New Item"} />
+      <Image source={{ uri: imageUrl }} style={styles.image} />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={{ marginBottom: 6, fontWeight: "bold" }}>Item Name</Text>
-        <TextInput
-          value={name}
+        <Text style={styles.label}>Item Name</Text>
+        <TextField
+          size="large"
           onChangeText={setName}
-          placeholder="Enter item name"
-          style={styles.input}
+          value={name}
+          placeholder={"Enter item name"}
+          icon="edit"
         />
 
         {loading ? (
@@ -144,14 +165,13 @@ const AddItem = () => {
       </ScrollView>
 
       <View style={styles.containerButton}>
-  <TextButton
-    title="Add Item"
-    size="large"
-    color="dark"
-    onPress={saveClothingItem}
-  />
-</View>
-
+        <TextButton
+          title="Add Item"
+          size="large"
+          color="dark"
+          onPress={saveClothingItem}
+        />
+      </View>
     </View>
   );
 };
@@ -160,15 +180,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 16,
   },
   image: {
     width: "100%",
     height: 200,
     resizeMode: "contain",
     marginBottom: 16,
+    padding: 10,
+    backgroundColor: theme.colors.backgrounds.secondary,
   },
   scrollContent: {
+    paddingHorizontal: theme.padding.normal,
     paddingBottom: 150,
   },
   containerButton: {
@@ -178,13 +200,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  input: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 12,
+  label: {
+    marginBottom: 6,
+    fontWeight: "bold",
   },
 });
 

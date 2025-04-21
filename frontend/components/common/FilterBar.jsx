@@ -9,19 +9,21 @@ import {
 } from "react-native";
 import Modal from "../common/Modal";
 import theme from "../../styles/theme";
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import AccordionView from "../AccordionView";
 
 const MAX_VISIBLE = 10;
 
-const FilterBar = ({ filters = {}, onFilterChange }) => {
+const FilterBar = ({ filters = {}, onFilterChange, defaultFilters }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [visibleFilters, setVisibleFilters] = useState([]);
 
   useEffect(() => {
-    setVisibleFilters(selectedFilters.slice(0, MAX_VISIBLE));
+    const base = ["All", ...defaultFilters];
+    const extra = selectedFilters.filter((f) => !base.includes(f));
+    const combined = [...base, ...extra];
+    setVisibleFilters(combined.slice(0, MAX_VISIBLE));
   }, [selectedFilters]);
 
   const getCategoryForFilter = (filter) => {
@@ -39,11 +41,20 @@ const FilterBar = ({ filters = {}, onFilterChange }) => {
   };
 
   const toggleFilterWithApply = (category, filter) => {
-    const updated = selectedFilters.includes(filter)
-      ? selectedFilters.filter((f) => f !== filter)
-      : [...selectedFilters, filter];
+    let updated;
+
+    if (filter === "All") {
+      updated = ["All"];
+      onFilterChange([]);
+    } else {
+      updated = selectedFilters.includes(filter)
+        ? selectedFilters.filter((f) => f !== filter)
+        : [...selectedFilters.filter((f) => f !== "All"), filter];
+
+      onFilterChange(updated);
+    }
+
     setSelectedFilters(updated);
-    onFilterChange(updated);
   };
 
   const applyFilters = (newSelections) => {
@@ -81,16 +92,25 @@ const FilterBar = ({ filters = {}, onFilterChange }) => {
         {visibleFilters.map((filter, idx) => (
           <TouchableOpacity
             key={idx}
-            onPress={() =>
-              toggleFilterWithApply(getCategoryForFilter(filter), filter)
-            }
+            onPress={() => {
+              if (filter === "All") {
+                setSelectedFilters([]);
+                onFilterChange([]);
+              } else {
+                toggleFilterWithApply(getCategoryForFilter(filter), filter);
+              }
+            }}
             style={[
               styles.tag,
-              selectedFilters.includes(filter) && styles.tagSelected,
+              (filter === "All" && selectedFilters.length === 0) ||
+              selectedFilters.includes(filter)
+                ? styles.tagSelected
+                : null,
             ]}
           >
             <Text
               style={
+                (filter === "All" && selectedFilters.length === 0) ||
                 selectedFilters.includes(filter)
                   ? styles.textSelected
                   : styles.text
@@ -125,7 +145,7 @@ const FilterBar = ({ filters = {}, onFilterChange }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flexDirection: "row", alignItems: "center", paddingLeft: 16 },
+  container: { flexDirection: "row", paddingTop: 15, alignItems: "center" },
   filterIcon: {
     width: 30,
     height: 30,

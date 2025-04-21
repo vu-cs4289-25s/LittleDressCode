@@ -6,16 +6,19 @@ import {
   Image,
   ActivityIndicator,
   Alert,
-  SafeAreaView,
   ScrollView,
+  Pressable,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/utils/firebaseConfig";
 import AccordionViewEdit from "@/components/AccordionViewEdit";
-import ShareButton from "@/components/buttons/ShareButton";
 import TextButton from "@/components/common/TextButton";
 import TextField from "@/components/common/Textfield";
+import InspectHeader from "@/components/headers/InspectHeader";
+import theme from "@/styles/theme";
+import { MaterialIcons } from "@expo/vector-icons";
+import ShareButton from "@/components/buttons/ShareButton";
 import DeleteButton from "@/components/common/DeleteIcon";
 
 const ClosetDetail = () => {
@@ -28,6 +31,7 @@ const ClosetDetail = () => {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const detailRef = useRef();
+  const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
     setSections([
@@ -116,6 +120,7 @@ const ClosetDetail = () => {
             4: data.season || [],
             5: data.fit || [],
           });
+          setIsFavorited(data.favorite);
         } else {
           console.warn("No clothing item found with id:", id);
         }
@@ -158,81 +163,96 @@ const ClosetDetail = () => {
     );
   }
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <DeleteButton
-          itemId={id}
-          collection="clothingItems"
-          onSuccess={() => {
-            Alert.alert("Item Deleted");
-            router.back();
-          }}
-          color="black"
-          size={26}
-          buttonStyle={styles.deleteButton}
-        />
-        <ShareButton type="closet" id={id} refToCapture={detailRef} />
-      </View>
+  const handleToggleFavorite = async () => {
+    try {
+      const newValue = !isFavorited;
+      setIsFavorited(newValue);
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View ref={detailRef} style={styles.content}>
-          <Image
-            source={{ uri: itemData.imageUrl }}
-            style={styles.image}
-            resizeMode="contain"
-          />
-          <View style={styles.nameInputContainer}>
-            {itemData?.name ? (
-              <Text style={styles.inputLabel}>{itemData.name}</Text>
-            ) : (
-              <Text style={styles.inputLabel}>Item Name</Text>
-            )}
+      const docRef = doc(db, "clothingItems", id);
+      await updateDoc(docRef, {
+        favorite: newValue,
+      });
+    } catch (err) {
+      console.error("Failed to update favorite status:", err);
+      Alert.alert("Error", "Could not update favorite status.");
+    }
+  };
+
+  return (
+    <View>
+      <InspectHeader
+        isFavorited={isFavorited}
+        toggleFavorite={handleToggleFavorite}
+      />
+      <Image
+        source={{ uri: itemData.imageUrl }}
+        style={styles.image}
+        resizeMode="contain"
+      />
+      <View style={styles.container}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View ref={detailRef} style={styles.content}>
+            <View style={styles.nameInputContainer}>
+              <View style={styles.infoHeader}>
+                {itemData?.name ? (
+                  <Text style={styles.inputLabel}>{itemData.name}</Text>
+                ) : (
+                  <Text style={styles.inputLabel}>Item Name</Text>
+                )}
+                <View style={styles.details}>
+                  <ShareButton  type="closet" id={id} refToCapture={detailRef} />
+                  <DeleteButton
+                    itemId={id}
+                    collection="clothingItems"
+                    onSuccess={() => {
+                      Alert.alert("Item Deleted");
+                      router.back();
+                    }}
+                    color="black"
+                    size={26}
+                    buttonStyle={styles.deleteButton}
+                  />
+                </View>
+              </View>
+            </View>
             <TextField
               size="large"
               onChangeText={setName}
               value={name}
-              placeholder="Edit item name"
+              placeholder={itemData ? itemData.name : "Item name"}
+              icon="edit"
             />
-          </View>
+            <View style={styles.accordionContainer}>
+              <AccordionViewEdit
+                sections={sections}
+                initialTags={selectedButtons}
+                onTagChange={setSelectedButtons}
+              />
+            </View>
 
-          <View style={styles.accordionContainer}>
-            <AccordionViewEdit
-              sections={sections}
-              initialTags={selectedButtons}
-              onTagChange={setSelectedButtons}
-            />
+            <View style={styles.buttonWrapper}>
+              <TextButton
+                title="Save Changes"
+                size="large"
+                color="dark"
+                onPress={handleSave}
+              />
+            </View>
           </View>
-
-          <View style={styles.buttonWrapper}>
-            <TextButton
-              title="Save Changes"
-              size="large"
-              color="dark"
-              onPress={handleSave}
-            />
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "white",
-    paddingTop: 32,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: theme.padding.normal,
+    paddingTop: 20,
   },
   title: {
     fontSize: 20,
@@ -244,22 +264,22 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 100,
-    paddingHorizontal: 16,
   },
   image: {
     width: "100%",
     height: 200,
-    borderRadius: 12,
-    marginBottom: 16,
+    borderRadius: 10,
+    marginBottom: 15,
+    backgroundColor: theme.colors.backgrounds.secondary,
+    padding: 20,
   },
   nameInputContainer: {
     width: "100%",
-    marginBottom: 20,
+    marginBottom: 15,
   },
   inputLabel: {
-    fontSize: 16,
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 8,
     color: "#333",
   },
   accordionContainer: {
@@ -269,6 +289,18 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: 30,
     marginBottom: 20,
+  },
+  infoHeader: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  details: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
   },
 });
 

@@ -13,6 +13,8 @@ import {
 import Header from "@/components/headers/Header";
 import { useCallback } from "react";
 import { auth } from "@/app/utils/firebaseConfig";
+import TextButton from "@/components/common/TextButton";
+import BackHeader from "@/components/headers/BackHeader";
 
 const OutfitScreen = () => {
   const { mode } = useLocalSearchParams();
@@ -122,7 +124,7 @@ const OutfitScreen = () => {
   return (
     <View style={styles.container}>
       {isSelectionMode ? (
-        <Header title={"Create a Collection"} backTo={"/collections"} />
+        <BackHeader title={"Create a Collection"} backTo={"/"} noPadding={true} />
       ) : (
         <Header
           title={"My Outfits"}
@@ -133,12 +135,13 @@ const OutfitScreen = () => {
       <FilterBar
         filters={OUTFIT_FILTERS}
         onFilterChange={handleFilterChange}
+        defaultFilters={["Casual", "Formal", "Sporty"]}
       />
 
       {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" />
-          <Text>Loading your outfits...</Text>
+          <Text style={styles.loadingText}>Loading your outfits...</Text>
         </View>
       ) : (
         <View style={styles.gridContainer}>
@@ -154,11 +157,13 @@ const OutfitScreen = () => {
             onItemPress={handleOutfitPress}
           />
           {isSelectionMode && selectedIds.length > 0 && (
-            <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-              <Text style={styles.nextButtonText}>
-                Next ({selectedIds.length})
-              </Text>
-            </TouchableOpacity>
+             <TextButton
+             title={`Next (${selectedIds.length})`}
+             size="large"
+             color="dark"
+             onPress={handleNext}
+           />
+           
           )}
         </View>
       )}
@@ -169,8 +174,9 @@ const OutfitScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
-    padding: 16,
+    backgroundColor: theme.colors.backgrounds.primary,
+    paddingHorizontal: theme.padding.normal,
+    paddingBottom: 0,
   },
   loadingContainer: {
     flex: 1,
@@ -191,6 +197,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
+  loadingText: {
+    paddingTop: theme.padding.normal,
+    fontSize: 15,
+    fontStyle: 'italic'
+  }
 });
 
 export default OutfitScreen;

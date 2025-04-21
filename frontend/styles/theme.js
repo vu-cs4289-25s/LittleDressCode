@@ -1,19 +1,19 @@
 const theme = {
   colors: {
     buttonBackground: {
-      light: "#F5F5F5",
+      light: "#F4F4F4",
       dark: "#181C25",
     },
     icons: {
       light: "#E1E1E1",
       medium: "#9A9A9A", // unselected nav location
       dark: "#181C25", // current nav location
-      favorited: "#F7B0BE",
-      default_heart: "#E1E1E1",
+      favorited: "#EA97AD",
+      default_heart: "#D0D0D0",
     },
     backgrounds: {
       primary: "white",
-      secondary: "#F5F5F5",
+      secondary: "#F4F4F4",
     },
     text: {
       lightest: "white",
@@ -45,7 +45,11 @@ const theme = {
     medium: 10,
     large: 15,
   },
-
+  padding: {
+    small: 10,
+    medium: 20,
+    normal: 25
+  },
   borderRadius: {
     default: 150,
     small: 10,

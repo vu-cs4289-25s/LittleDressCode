@@ -1,6 +1,7 @@
 import React from "react";
 import { View, FlatList, StyleSheet } from "react-native";
 import ItemContainer from "./ItemContainer";
+import theme from "@/styles/theme";
 
 const GridLayout = ({
   data,
@@ -50,8 +51,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   grid: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: theme.padding.medium,
   },
   gridItem: {
     flexBasis: "48%", // slightly less than 50% to leave room for margin

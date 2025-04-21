@@ -1,15 +1,25 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, ScrollView, Button, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { auth, db } from "@/app/utils/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
-
-import Header from "@/components/headers/Header";
+import theme from "@/styles/theme";
 import ItemContainer from "@/components/organization/ItemContainer";
 import TextField from "@/components/common/Textfield";
 import AccordionView from "@/components/AccordionView";
 import { addCollection } from "@/app/utils/collectionsService";
 import { useFocusEffect } from "@react-navigation/native";
+import BackHeader from "@/components/headers/BackHeader";
+import TextButton from "@/components/common/TextButton";
+const { width } = Dimensions.get("window");
+const OUTFIT_CONTAINER_WIDTH = width * 0.5;
 
 const sections = [
   {
@@ -49,10 +59,7 @@ const NewCollection = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log("Authenticated user:", user.uid);
         setUserId(user.uid);
-      } else {
-        console.warn("No user logged in.");
       }
     });
     return unsubscribe;
@@ -60,7 +67,6 @@ const NewCollection = () => {
 
   // Fetch selected outfits
   const fetchSelectedOutfits = async () => {
-    console.log("Fetching selected outfits for IDs:", selectedIds);
     try {
       const snapshot = await getDocs(collection(db, "outfits"));
       const data = snapshot.docs.map((doc) => ({
@@ -69,7 +75,6 @@ const NewCollection = () => {
       }));
 
       const filtered = data.filter((item) => selectedIds.includes(item.id));
-      console.log("Filtered outfits:", filtered);
       setOutfits(filtered);
     } catch (err) {
       console.error("Error fetching outfits:", err);
@@ -111,25 +116,8 @@ const NewCollection = () => {
       ...(selectedButtons["occasion"] || []),
     ];
 
-    console.log("Saving new collection with:");
-    console.log("User ID:", userId);
-    console.log("Name:", name.trim());
-    console.log("Outfit IDs:", outfitIds);
-    console.log("Tags:", tags);
-
     try {
-      const docId = await addCollection(
-        userId,
-        name.trim(),
-        outfitIds,
-        "",
-        tags,
-        true
-      );
-
-      console.log("Collection created with ID:", docId);
-
-      // Navigate and refresh collections page
+      await addCollection(userId, name.trim(), outfitIds, "", tags, true);
       router.replace("/");
     } catch (err) {
       console.error("Error saving collection:", err);
@@ -138,42 +126,44 @@ const NewCollection = () => {
 
   return (
     <View style={styles.container}>
-      <Header
-        title="New Collection"
-        showBackButton
-        backTo="/outfits"
-        showSearch={false}
-      />
+      <BackHeader title="New Collection" noPadding={true} />
 
       <ScrollView
         style={styles.body}
         contentContainerStyle={styles.bodyContent}
         keyboardShouldPersistTaps="handled"
       >
-        {isLoading ? (
-          <Text>Loading selected outfits...</Text>
-        ) : (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.scroll}
-            contentContainerStyle={styles.scrollContent}
-          >
-            {outfits.map((item) => (
-              <View key={item.id} style={styles.itemWrapper}>
-                <ItemContainer
-                  clothingItem={item}
-                  isFavorited={false}
-                  toggleFavorite={() => {}}
-                  isSelectable={false}
-                  isSelected={false}
-                  showControls={false}
-                  isOutfit={true}
-                />
-              </View>
-            ))}
-          </ScrollView>
-        )}
+        <View style={styles.outfitsSection}>
+          {isLoading ? (
+            <Text>Loading outfits...</Text>
+          ) : outfits.length > 0 ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.outfitsScrollContent}
+              decelerationRate="fast"
+              snapToInterval={OUTFIT_CONTAINER_WIDTH + 16}
+              snapToAlignment="center"
+            >
+              {outfits.map((item) => (
+                <View key={item.id} style={styles.outfitContainer}>
+                  <ItemContainer
+                    clothingItem={item}
+                    isFavorited={false}
+                    toggleFavorite={() => {}}
+                    isSelectable={false}
+                    isSelected={false}
+                    showControls={false}
+                    isOutfit={true}
+                    style={styles.itemContainer}
+                  />
+                </View>
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={styles.noOutfitsText}>No outfits selected</Text>
+          )}
+        </View>
 
         <View style={styles.inputWrapper}>
           <TextField
@@ -192,9 +182,16 @@ const NewCollection = () => {
             onSelectButton={onSelectButton}
           />
         </View>
-
-        <Button title="Save Collection" onPress={handleSave} />
       </ScrollView>
+
+      <View style={styles.containerButton}>
+        <TextButton
+          title="Save Collection"
+          size="large"
+          color="dark"
+          onPress={handleSave}
+        />
+      </View>
     </View>
   );
 };
@@ -203,31 +200,57 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    paddingHorizontal: 16,
+    paddingHorizontal: theme.padding.normal,
   },
   body: {
     flex: 1,
   },
-  scroll: {
-    marginBottom: 0,
-    maxHeight: 200,
+  bodyContent: {
+    paddingBottom: 40,
   },
-  scrollContent: {
+  outfitsSection: {
+    marginTop: 16,
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 12,
+    color: "#333",
+  },
+  outfitsScrollContent: {
     paddingRight: 16,
+    alignItems: "center",
   },
-  itemWrapper: {
-    marginRight: 12,
-    alignSelf: "flex-start",
+  outfitContainer: {
+    width: OUTFIT_CONTAINER_WIDTH,
+    marginRight: 16,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  itemContainer: {
+    width: "100%",
+    aspectRatio: 1,
+  },
+  noOutfitsText: {
+    textAlign: "center",
+    color: "#999",
+    marginVertical: 20,
   },
   inputWrapper: {
-    width: "100%",
-    alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 24,
   },
-  accordianWrapper: {},
-  bodyContent: {
-    gap: 12,
-    paddingBottom: 40,
+  accordianWrapper: {
+    marginBottom: 24,
+  },
+  containerButton: {
+    padding: 16,
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    backgroundColor: "white",
+    zIndex: 10,
   },
 });
 
